@@ -112,12 +112,12 @@ class _PricesPageState extends State<PricesPage> {
   Future goldPrices() async {
     // Get data from API
     var response =
-        await http.get(Uri.parse('${Variables.baseUrl}/api/gold_price/'));
+        await http.get(Uri.parse('${Variables.baseUrl}${Variables.apiGoldPriceEndpoint}'));
     if (response.statusCode == 200) {
       // Parse JSON to Dart object
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to load Bid Info');
+      throw Exception(Variables.failedLoadBidInfoText);
     }
   }
 }

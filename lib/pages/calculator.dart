@@ -3,8 +3,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import '../constant/variables.dart';
 
-// Declare variables
-const url = "ar-rahnu-calculator";
+// URL moved to environment variables
 
 class CalculatorPage extends StatefulWidget {
   const CalculatorPage({super.key});
@@ -35,7 +34,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
       }, onPageFinished: (String url) {
         EasyLoading.dismiss();
       }))
-      ..loadRequest(Uri.parse('${Variables.baseUrl}/$url/'));
+      ..loadRequest(Uri.parse('${Variables.baseUrl}/${Variables.calculatorUrl}/'));
     _controller = controller;
   }
 
@@ -43,7 +42,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ArRahnu Calculator'),
+        title: Text(Variables.calculatorTitle),
       ),
       body: WebViewWidget(controller: _controller),
     );

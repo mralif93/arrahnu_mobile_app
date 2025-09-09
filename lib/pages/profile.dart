@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import '../model/user.dart';
 import '../pages/navigation.dart';
 import '../controllers/authorization.dart';
+import '../constant/variables.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -92,18 +93,18 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (res) {
       Get.defaultDialog(
-        title: "Success",
-        middleText: "Profile Updated Successfully",
-        textConfirm: "OK",
+        title: Variables.successTitle,
+        middleText: Variables.profileUpdatedText,
+        textConfirm: Variables.okText,
         onConfirm: () {
           Navigator.pop(context);
         },
       );
     } else {
       Get.defaultDialog(
-        title: "Failed",
-        middleText: "Failed to update profile",
-        textConfirm: "OK",
+        title: Variables.failedTitle,
+        middleText: Variables.profileUpdateFailedText,
+        textConfirm: Variables.okText,
         onConfirm: () {
           Navigator.pop(context);
         },
@@ -115,19 +116,19 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "BMMB Pajak Gadai-i",
+        title: Text(
+          Variables.appName,
         ),
       ),
       body: Center(
         child: Column(
           children: [
             // avatar image
-            const QAvatar(
+            QAvatar(
               name: '',
               mobile: '',
               image:
-                  'https://cdn1.iconfinder.com/data/icons/user-pictures/100/unknown-514.png',
+                  Variables.defaultAvatarUrl,
             ),
 
             // fullname text field

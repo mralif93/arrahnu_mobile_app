@@ -2,10 +2,17 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'theme/theme_provider.dart';
 import '../pages/navigation.dart';
+import 'constant/variables.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Load environment variables
+  await dotenv.load(fileName: ".env");
+  
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeProvider(),
@@ -21,7 +28,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "BMMB Pajak Gadai-i",
+      title: Variables.appName,
       theme: Provider.of<ThemeProvider>(context).themeData,
       home: const NavigationPage(),
       builder: EasyLoading.init(),

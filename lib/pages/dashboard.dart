@@ -156,7 +156,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   name: profile.fullName,
                   mobile: '+60${profile.hpNumber}',
                   image:
-                      'https://cdn1.iconfinder.com/data/icons/user-pictures/100/unknown-514.png',
+                      Variables.defaultAvatarUrl,
                 ),
 
                 // sQpace

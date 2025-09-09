@@ -22,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
 
   final TapGestureRecognizer _registerGestureRecognizer = TapGestureRecognizer()
     ..onTap = () async {
-      Uri registerUrl = Uri.parse("${Variables.baseUrl}/signup/");
+      Uri registerUrl = Uri.parse("${Variables.baseUrl}${Variables.signupUrl}");
       if (await canLaunchUrl(registerUrl)) {
         await launchUrl(registerUrl);
       } else {
@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
   final TapGestureRecognizer _forgotPasswordGestureRecognizer =
       TapGestureRecognizer()
         ..onTap = () async {
-          var resetPassword = Uri.parse('${Variables.baseUrl}/password/reset/');
+          var resetPassword = Uri.parse('${Variables.baseUrl}${Variables.passwordResetUrl}');
           if (await canLaunchUrl(resetPassword)) {
             await launchUrl(resetPassword);
           } else {

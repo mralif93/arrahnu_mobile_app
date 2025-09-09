@@ -24,10 +24,10 @@ class _HomePageState extends State<HomePage> {
   bool statusView = false;
 
   final _images = [
-    "assets/images/product_features.png",
-    "assets/images/gold_price.png",
-    "assets/images/calculator.png",
-    "assets/images/auction.png",
+    Variables.assetProductFeatures,
+    Variables.assetGoldPrice,
+    Variables.assetCalculator,
+    Variables.assetAuction,
   ];
 
   @override
@@ -165,7 +165,7 @@ class _HomePageState extends State<HomePage> {
                           ..indicatorType =
                               EasyLoadingIndicatorType.fadingCircle
                           ..loadingStyle = EasyLoadingStyle.dark;
-                        EasyLoading.show(status: 'Please wait');
+                        EasyLoading.show(status: Variables.pleaseWaitText);
                       } else if (snapshot.hasError) {
                         // Dismiss Loading
                         EasyLoading.dismiss();
@@ -186,17 +186,17 @@ class _HomePageState extends State<HomePage> {
                                 .toLocal();
 
                         children = <Widget>[
-                          const Text('Sistem e-Lelong (Pajak Gadai-i)',
-                              style: TextStyle(
+                          Text(Variables.systemTitle,
+                              style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold)),
-                          const Text('Ar-Rahnu Online Auction System',
-                              style: TextStyle(fontSize: 12)),
+                          Text(Variables.auctionSystemTitle,
+                              style: const TextStyle(fontSize: 12)),
                           const SizedBox(height: 30),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              const Text('Bidding Session Start at:',
+                              Text(Variables.biddingStartText,
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold)),
@@ -206,7 +206,7 @@ class _HomePageState extends State<HomePage> {
                               Text(DateFormat('dd/MM/yyyy hh:mm a')
                                   .format(startBidding)),
                               const SizedBox(height: 15),
-                              const Text('Bidding Session End at:',
+                              Text(Variables.biddingEndText,
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold)),
@@ -222,7 +222,7 @@ class _HomePageState extends State<HomePage> {
                         // Dismiss Loading
                         EasyLoading.dismiss();
                         children = <Widget>[
-                          const Center(child: Text('Good!')),
+                          Center(child: Text(Variables.goodStatusText)),
                         ];
                       }
 
@@ -244,7 +244,7 @@ class _HomePageState extends State<HomePage> {
   Future checkBidingTime() async {
     // Get data from API
     var response = await http.get(Uri.parse(
-        '${Variables.baseUrl}/api/v2/pages/?type=product.BranchIndexPage&fields=*'));
+        '${Variables.baseUrl}${Variables.apiPagesEndpoint}?type=product.BranchIndexPage&fields=*'));
     if (response.statusCode == 200) {
       // Parse JSON to Dart object
       Map<String, dynamic> jsonData = jsonDecode(response.body);
@@ -261,19 +261,19 @@ class _HomePageState extends State<HomePage> {
 
       if (currentDate.compareTo(startDate) == 1 &&
           currentDate.compareTo(endDate) == 1) {
-        print('Waiting for Bidding!');
+        print(Variables.waitingBiddingText);
         setState(() {
           statusView = false;
         });
       } else if (currentDate.compareTo(startDate) == 1 &&
           currentDate.compareTo(endDate) == -1) {
-        print('Bidding on Progress!');
+        print(Variables.biddingProgressText);
         setState(() {
           statusView = true;
         });
       } else if (currentDate.compareTo(startDate) == -1 &&
           currentDate.compareTo(endDate) == -1) {
-        print('Already Done Bidding!');
+        print(Variables.biddingDoneText);
         setState(() {
           statusView = false;
         });
@@ -284,7 +284,7 @@ class _HomePageState extends State<HomePage> {
   Future fetchBiddingInfo() async {
     // Get data from API
     var response = await http.get(Uri.parse(
-        '${Variables.baseUrl}/api/v2/pages/?type=product.BranchIndexPage&fields=*'));
+        '${Variables.baseUrl}${Variables.apiPagesEndpoint}?type=product.BranchIndexPage&fields=*'));
     if (response.statusCode == 200) {
       // Parse JSON to Dart object
       Map<String, dynamic> jsonData = jsonDecode(response.body);
@@ -292,6 +292,6 @@ class _HomePageState extends State<HomePage> {
       return jsonData['items'];
     }
 
-    throw Exception('Failed to load data!');
+    throw Exception(Variables.failedLoadDataText);
   }
 }

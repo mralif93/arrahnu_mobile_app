@@ -15,7 +15,7 @@ class AuthController {
   // Login
   Future login(String username, String password) async {
     try {
-      final url = Uri.parse('${Variables.baseUrl}/api/token/');
+      final url = Uri.parse('${Variables.baseUrl}${Variables.apiTokenEndpoint}');
       final reqHeaders = {'Content-Type': 'application/json'};
       final reqBody = {
         "username": username,
@@ -79,7 +79,7 @@ class AuthController {
     refresh = await SecureStorage().readSecureData('refresh');
 
     try {
-      final url = Uri.parse('${Variables.baseUrl}/api/token/refresh/');
+      final url = Uri.parse('${Variables.baseUrl}${Variables.apiTokenRefreshEndpoint}');
       final reqHeaders = {'Content-Type': 'application/json'};
       final reqBody = {
         "refresh": refresh,
@@ -109,7 +109,7 @@ class AuthController {
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
     int userId = decodedToken["user_id"];
 
-    final url = Uri.parse('${Variables.baseUrl}/api/profile/$userId');
+    final url = Uri.parse('${Variables.baseUrl}${Variables.apiProfileEndpoint}$userId');
     Map<String, String> header = {"Authorization": "Bearer $token"};
 
     var response = await http.get(url, headers: header);
@@ -130,7 +130,7 @@ class AuthController {
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
     int userId = decodedToken["user_id"];
 
-    final url = Uri.parse('${Variables.baseUrl}/api/bid_list/${userId}');
+    final url = Uri.parse('${Variables.baseUrl}${Variables.apiBidListEndpoint}${userId}');
     Map<String, String> header = {"Authorization": "Bearer $token"};
 
     var response = await http.get(url, headers: header);
@@ -150,7 +150,7 @@ class AuthController {
     // int userId = decodedToken["user_id"];
 
     final url = Uri.parse(
-        '${Variables.baseUrl}/api/v2/pages/?type=product.ProductPage&fields=*&limit=8000');
+        '${Variables.baseUrl}${Variables.apiPagesEndpoint}?type=product.ProductPage&fields=*&limit=8000');
     Map<String, String> header = {"Authorization": "Bearer $token"};
 
     var response = await http.get(url, headers: header);
@@ -194,7 +194,7 @@ class AuthController {
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
     int userId = decodedToken["user_id"];
 
-    final url = Uri.parse('${Variables.baseUrl}/api/bid_create/');
+    final url = Uri.parse('${Variables.baseUrl}${Variables.apiBidCreateEndpoint}');
     Map<String, String> reqHeaders = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'
@@ -237,7 +237,7 @@ class AuthController {
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
     int userId = decodedToken["user_id"];
 
-    final url = Uri.parse('${Variables.baseUrl}/api/profile/$userId');
+    final url = Uri.parse('${Variables.baseUrl}${Variables.apiProfileEndpoint}$userId');
     Map<String, String> reqHeaders = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'

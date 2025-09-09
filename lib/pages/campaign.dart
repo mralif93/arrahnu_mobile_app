@@ -21,33 +21,29 @@ class _CampaignPageState extends State<CampaignPage> {
   List items = [
     {
       "id": 8,
-      "title": "Ar-Rahnu, Islamic Pawn Broking (Tawarruq)",
-      "description":
-          "Benefits of Ar-Rahnu:\r\n\r\n1) Fully-Shariah compliant product\r\n2) Free from Riba’ (usury) and Gharar (uncertainty)\r\n3) Fixed Profit Rate on the financing amount\r\n4) No early redemption charges\r\n5) High margin of advance\r\n6) Fast, easy and secure\r\n7) Gold cleaning service\r\n8) Improve customer experience by providing convenient online Ar-Rahnu revaluation transaction without present at BMMB premise.\r\n9) Accept gold bullion (bar/coins/dinar) for pawning without opening the seal (15 selected branches only).",
-      "image":
-          "https://arrahnuauction.muamalat.com.my/media/announcement/Ar_Rahnu_Promotion_Deal_8.99-01.jpg",
-      "datetime_created": "2023-12-05T17:23:00.258276+08:00",
-      "datetime_modified": "2023-12-05T22:53:03.033911+08:00",
+      "title": Variables.campaignTitle1,
+      "description": Variables.campaignDescription1,
+      "image": Variables.promotionImage1,
+      "datetime_created": Variables.campaignDatetimeCreated1,
+      "datetime_modified": Variables.campaignDatetimeModified1,
       "is_active": true,
       "is_default": true,
-      "staff": 1981,
-      "created_by": 1981,
-      "updated_by": 1981
+      "staff": Variables.campaignStaffId,
+      "created_by": Variables.campaignCreatedBy,
+      "updated_by": Variables.campaignUpdatedBy
     },
     {
       "id": 9,
-      "title": "Ar-Rahnu, Islamic Pawn Broking (Tawarruq)",
-      "description":
-          "Benefits of Ar-Rahnu:\r\n\r\n1) Fully-Shariah compliant product\r\n2) Free from Riba’ (usury) and Gharar (uncertainty)\r\n3) Fixed Profit Rate on the financing amount\r\n4) No early redemption charges\r\n5) High margin of advance\r\n6) Fast, easy and secure\r\n7) Gold cleaning service\r\n8) Improve customer experience by providing convenient online Ar-Rahnu revaluation transaction without present at BMMB premise.\r\n9) Accept gold bullion (bar/coins/dinar) for pawning without opening the seal (15 selected branches only).",
-      "image":
-          "https://arrahnuauction.muamalat.com.my/media/announcement/Ar_Rahnu_Promotion_Deal_0.75-03.jpg",
-      "datetime_created": "2023-12-05T17:23:34.395019+08:00",
-      "datetime_modified": "2023-12-05T17:33:48.750587+08:00",
+      "title": Variables.campaignTitle1,
+      "description": Variables.campaignDescription1,
+      "image": Variables.promotionImage2,
+      "datetime_created": Variables.campaignDatetimeCreated2,
+      "datetime_modified": Variables.campaignDatetimeModified2,
       "is_active": true,
       "is_default": false,
-      "staff": 1981,
-      "created_by": 1981,
-      "updated_by": 1981
+      "staff": Variables.campaignStaffId,
+      "created_by": Variables.campaignCreatedBy,
+      "updated_by": Variables.campaignUpdatedBy
     }
   ];
 

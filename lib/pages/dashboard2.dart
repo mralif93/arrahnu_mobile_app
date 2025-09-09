@@ -111,7 +111,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       image: const DecorationImage(
                         fit: BoxFit.cover,
                         image: NetworkImage(
-                            'https://cdn1.iconfinder.com/data/icons/user-pictures/100/unknown-514.png'),
+                            Variables.defaultAvatarUrl),
                       ),
                     ),
                   ),
@@ -222,9 +222,9 @@ class _DashboardPageState extends State<DashboardPage> {
                               builder: (ctx) =>
                                   // Alert
                                   AlertDialog(
-                                    title: const Text("Confirm Sign Out"),
+                                    title: Text(Variables.confirmSignOutTitle),
                                     content:
-                                        const Text("Are you sure to sign out?"),
+                                        Text(Variables.signOutConfirmText),
                                     actions: [
                                       TextButton(
                                         onPressed: () {
