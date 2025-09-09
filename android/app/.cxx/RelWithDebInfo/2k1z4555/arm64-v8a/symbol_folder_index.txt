@@ -1,0 +1,1 @@
+/Users/administrator/Desktop/Project/Flutter/arrahnu_mobile_app/build/app/intermediates/cxx/RelWithDebInfo/2k1z4555/obj/arm64-v8a

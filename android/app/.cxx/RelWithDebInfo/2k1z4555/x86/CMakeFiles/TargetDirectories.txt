@@ -1,0 +1,2 @@
+/Users/administrator/Desktop/Project/Flutter/arrahnu_mobile_app/android/app/.cxx/RelWithDebInfo/2k1z4555/x86/CMakeFiles/edit_cache.dir
+/Users/administrator/Desktop/Project/Flutter/arrahnu_mobile_app/android/app/.cxx/RelWithDebInfo/2k1z4555/x86/CMakeFiles/rebuild_cache.dir
