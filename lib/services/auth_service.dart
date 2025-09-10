@@ -68,31 +68,39 @@ class AuthService {
     try {
       final token = await SecureStorage().readSecureData('token');
       
-      if (token == 'No data found!!') {
+      if (token == 'No data found!!' || token.isEmpty) {
         return ApiResponse<bool>.success(data: false);
       }
 
-      final isExpired = JwtDecoder.isExpired(token);
-      
-      if (isExpired) {
-        // Try to refresh token
-        final refreshResponse = await _apiService.refreshToken();
+      // Check if token is valid and not expired
+      try {
+        final isExpired = JwtDecoder.isExpired(token);
         
-        if (refreshResponse.isSuccess && refreshResponse.data != null) {
-          final newToken = refreshResponse.data!['access'];
-          if (newToken != null) {
-            await SecureStorage().writeSecureData('token', newToken);
-            return ApiResponse<bool>.success(data: true);
+        if (isExpired) {
+          // Try to refresh token
+          final refreshResponse = await _apiService.refreshToken();
+          
+          if (refreshResponse.isSuccess && refreshResponse.data != null) {
+            final newToken = refreshResponse.data!['access'];
+            if (newToken != null && newToken.isNotEmpty) {
+              await SecureStorage().writeSecureData('token', newToken);
+              return ApiResponse<bool>.success(data: true);
+            }
           }
+          
+          // If refresh fails, clear tokens
+          await SecureStorage().deleteSecureData('token');
+          await SecureStorage().deleteSecureData('refresh');
+          return ApiResponse<bool>.success(data: false);
         }
-        
-        // If refresh fails, clear tokens
+
+        return ApiResponse<bool>.success(data: true);
+      } catch (e) {
+        // If JWT decoding fails, clear tokens
         await SecureStorage().deleteSecureData('token');
         await SecureStorage().deleteSecureData('refresh');
         return ApiResponse<bool>.success(data: false);
       }
-
-      return ApiResponse<bool>.success(data: true);
     } catch (e) {
       return ApiResponse<bool>.error(
         error: ApiError(
