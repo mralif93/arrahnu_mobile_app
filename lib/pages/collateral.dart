@@ -157,7 +157,10 @@ class _CollateralPageState extends State<CollateralPage> {
 
   Future getBiddings() async {
     final response = await AuthController().getUserBidding();
-    var jsonData = jsonDecode(response);
+    if (!response.isSuccess || response.data == null) {
+      return;
+    }
+    var jsonData = response.data!;
 
     //  variables
     final List accounts = [];
@@ -296,10 +299,10 @@ class _CollateralPageState extends State<CollateralPage> {
                                       dataCompile[0]['_totalReservedPrice'];
                                   var bidPrice =
                                       double.parse(_inputController.text);
-                                  final res = await AuthController()
+                                  final response = await AuthController()
                                       .submitUserBid(
                                           productId, originalPrice, bidPrice);
-                                  if (res) {
+                                  if (response.isSuccess) {
                                     // If the form is valid, display a Snackbar.
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(

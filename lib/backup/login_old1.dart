@@ -52,12 +52,11 @@ class _LoginPageState extends State<LoginPage> {
         _passwordController.text.isNotEmpty) {
       // sign user in
       try {
-        final resp = await AuthController().login(
+        final response = await AuthController().login(
             _emailController.text.toString(),
             _passwordController.text.toString());
-        Map<String, dynamic> data = jsonDecode(resp.body);
 
-        if (resp.statusCode == 200) {
+        if (response.isSuccess) {
           // reset input
           _emailController.clear();
           _passwordController.clear();

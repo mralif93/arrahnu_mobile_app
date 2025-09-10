@@ -3,6 +3,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../constant/variables.dart';
+import '../controllers/authorization.dart';
 
 class PricesPage extends StatefulWidget {
   const PricesPage({super.key});
@@ -110,14 +111,12 @@ class _PricesPageState extends State<PricesPage> {
   }
 
   Future goldPrices() async {
-    // Get data from API
-    var response =
-        await http.get(Uri.parse('${Variables.baseUrl}${Variables.apiGoldPriceEndpoint}'));
-    if (response.statusCode == 200) {
-      // Parse JSON to Dart object
-      return json.decode(response.body);
-    } else {
-      throw Exception(Variables.failedLoadBidInfoText);
+    final response = await AuthController().getGoldPrices();
+    
+    if (response.isSuccess && response.data != null) {
+      return response.data!;
     }
+    
+    throw Exception(response.error?.userMessage ?? Variables.failedLoadBidInfoText);
   }
 }

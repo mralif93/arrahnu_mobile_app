@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import '../constant/variables.dart';
+import '../controllers/authorization.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -282,16 +283,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future fetchBiddingInfo() async {
-    // Get data from API
-    var response = await http.get(Uri.parse(
-        '${Variables.baseUrl}${Variables.apiPagesEndpoint}?type=product.BranchIndexPage&fields=*'));
-    if (response.statusCode == 200) {
-      // Parse JSON to Dart object
-      Map<String, dynamic> jsonData = jsonDecode(response.body);
-
-      return jsonData['items'];
+    final response = await AuthController().getBiddingInfo();
+    
+    if (response.isSuccess && response.data != null) {
+      return response.data!;
     }
-
-    throw Exception(Variables.failedLoadDataText);
+    
+    throw Exception(response.error?.userMessage ?? Variables.failedLoadDataText);
   }
 }

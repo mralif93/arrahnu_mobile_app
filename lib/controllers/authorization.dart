@@ -6,161 +6,56 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import '../constant/variables.dart';
+import '../services/auth_service.dart';
+import '../services/bidding_service.dart';
+import '../models/api_response.dart';
 
 class AuthController {
   //  Variables
   late String token, refresh;
   late bool isExpired = false;
+  
+  // Services
+  final AuthService _authService = AuthService();
+  final BiddingService _biddingService = BiddingService();
 
   // Login
-  Future login(String username, String password) async {
-    try {
-      final url = Uri.parse('${Variables.baseUrl}${Variables.apiTokenEndpoint}');
-      final reqHeaders = {'Content-Type': 'application/json'};
-      final reqBody = {
-        "username": username,
-        "password": password,
-      };
-
-      final res =
-          await http.post(url, headers: reqHeaders, body: jsonEncode(reqBody));
-
-      // print(res.statusCode);
-      // print(res.body);
-
-      if (res.statusCode == 200) {
-        var jsonResponse = jsonDecode(res.body);
-        token = jsonResponse['access'];
-        refresh = jsonResponse['refresh'];
-
-        // Stored Data
-        await SecureStorage().writeSecureData("token", token);
-        await SecureStorage().writeSecureData("refresh", refresh);
-
-        return res;
-      }
-
-      return res;
-    } catch (e) {
-      print(e.toString());
-    }
+  Future<ApiResponse<Map<String, dynamic>>> login(String username, String password) async {
+    return await _authService.login(
+      username: username,
+      password: password,
+    );
   }
 
   // Logout
-  Future logout() async {
-    try {
-      await SecureStorage().deleteSecureData("token");
-      await SecureStorage().deleteSecureData("refresh");
-      return true;
-    } catch (e) {
-      print(e.toString());
-    }
+  Future<ApiResponse<bool>> logout() async {
+    return await _authService.logout();
   }
 
   // Session
-  Future session() async {
-    token = await SecureStorage().readSecureData('token');
-    if (token != 'No data found!!') {
-      isExpired = JwtDecoder.isExpired(token);
-      if (isExpired) {
-        //  try refresh token
-        // if (await refreshToken()) {
-        //   return true;
-        // }
-        return false;
-      }
-      return true;
-    }
-    return false;
+  Future<bool> session() async {
+    final response = await _authService.checkSession();
+    return response.isSuccess && response.data == true;
   }
 
   // Refresh Token
-  Future refreshToken() async {
-    refresh = await SecureStorage().readSecureData('refresh');
-
-    try {
-      final url = Uri.parse('${Variables.baseUrl}${Variables.apiTokenRefreshEndpoint}');
-      final reqHeaders = {'Content-Type': 'application/json'};
-      final reqBody = {
-        "refresh": refresh,
-      };
-
-      final res =
-          await http.post(url, headers: reqHeaders, body: jsonEncode(reqBody));
-
-      if (res.statusCode == 200) {
-        var jsonResponse = jsonDecode(res.body);
-        token = jsonResponse['access'];
-
-        // Stored Data
-        await SecureStorage().writeSecureData("token", token);
-        return true;
-      }
-
-      return false;
-    } catch (e) {
-      print(e.toString());
-    }
+  Future<ApiResponse<Map<String, dynamic>>> refreshToken() async {
+    return await _authService.apiService.refreshToken();
   }
 
   // Profile
-  Future getUserProfile() async {
-    String token = await SecureStorage().readSecureData('token');
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-    int userId = decodedToken["user_id"];
-
-    final url = Uri.parse('${Variables.baseUrl}${Variables.apiProfileEndpoint}$userId');
-    Map<String, String> header = {"Authorization": "Bearer $token"};
-
-    var response = await http.get(url, headers: header);
-    if (response.statusCode == 200) {
-      return User.fromJson(jsonDecode(response.body));
-    }
-
-    if (response.statusCode == 401) {
-      return false;
-    }
-
-    return null;
+  Future<ApiResponse<User>> getUserProfile() async {
+    return await _authService.getUserProfile();
   }
 
   // Get User Biddings
-  Future getUserBidding() async {
-    String token = await SecureStorage().readSecureData('token');
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-    int userId = decodedToken["user_id"];
-
-    final url = Uri.parse('${Variables.baseUrl}${Variables.apiBidListEndpoint}${userId}');
-    Map<String, String> header = {"Authorization": "Bearer $token"};
-
-    var response = await http.get(url, headers: header);
-    if (response.statusCode == 200) {
-      return response.body;
-    }
-
-    if (response.statusCode == 401) {
-      return false;
-    }
+  Future<ApiResponse<List<dynamic>>> getUserBidding() async {
+    return await _biddingService.getUserBiddings();
   }
 
-  // Get User Biddings
-  Future getBiddingAccounts() async {
-    String token = await SecureStorage().readSecureData('token');
-    // Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-    // int userId = decodedToken["user_id"];
-
-    final url = Uri.parse(
-        '${Variables.baseUrl}${Variables.apiPagesEndpoint}?type=product.ProductPage&fields=*&limit=8000');
-    Map<String, String> header = {"Authorization": "Bearer $token"};
-
-    var response = await http.get(url, headers: header);
-    if (response.statusCode == 200) {
-      return response.body;
-    }
-
-    if (response.statusCode == 401) {
-      return false;
-    }
+  // Get Bidding Accounts
+  Future<ApiResponse<List<dynamic>>> getBiddingAccounts() async {
+    return await _biddingService.getBiddingAccounts();
   }
 
   // get current datetime format in utc
@@ -189,39 +84,16 @@ class AuthController {
   }
 
   // Submit User Bid
-  Future submitUserBid(productId, originalPrice, bidPrice) async {
-    String token = await SecureStorage().readSecureData('token');
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-    int userId = decodedToken["user_id"];
-
-    final url = Uri.parse('${Variables.baseUrl}${Variables.apiBidCreateEndpoint}');
-    Map<String, String> reqHeaders = {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json'
-    };
-    final reqBody = {
-      'reserved_price': convertToDecimals(originalPrice, 2),
-      'bid_offer': convertToDecimals(bidPrice, 2),
-      'created_at': getCurrentDateTimeUtc(),
-      'user': userId,
-      'product': productId,
-    };
-
-    final res =
-        await http.post(url, headers: reqHeaders, body: jsonEncode(reqBody));
-
-    // success
-    if (res.statusCode == 200) {
-      return true;
-    }
-
-    // failure
-    else {
-      return false;
-    }
+  Future<ApiResponse<Map<String, dynamic>>> submitUserBid(productId, originalPrice, bidPrice) async {
+    return await _biddingService.submitUserBid(
+      productId: productId,
+      originalPrice: originalPrice,
+      bidPrice: bidPrice,
+    );
   }
 
-  Future updateUserProfile(
+  // Update User Profile
+  Future<ApiResponse<User>> updateUserProfile(
     int id,
     String fullName,
     String idNum,
@@ -233,39 +105,42 @@ class AuthController {
     int hpNumber,
     int user,
   ) async {
-    String token = await SecureStorage().readSecureData('token');
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-    int userId = decodedToken["user_id"];
+    return await _authService.updateUserProfile(
+      id: id,
+      fullName: fullName,
+      idNum: idNum,
+      address: address,
+      postalCode: postalCode,
+      city: city,
+      state: state,
+      country: country,
+      hpNumber: hpNumber,
+      user: user,
+    );
+  }
 
-    final url = Uri.parse('${Variables.baseUrl}${Variables.apiProfileEndpoint}$userId');
-    Map<String, String> reqHeaders = {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json'
-    };
+  // Get Bidding Info
+  Future<ApiResponse<List<dynamic>>> getBiddingInfo() async {
+    return await _biddingService.getBiddingInfo();
+  }
 
-    final reqBody = {
-      'id': id,
-      'full_name': fullName,
-      'id_num': idNum,
-      'address': address,
-      'postal_code': postalCode,
-      'city': city,
-      'state': state,
-      'country': country,
-      'hp_number': hpNumber,
-      "user": user,
-    };
+  // Get Gold Prices
+  Future<ApiResponse<Map<String, dynamic>>> getGoldPrices() async {
+    return await _biddingService.getGoldPrices();
+  }
 
-    final res =
-        await http.post(url, headers: reqHeaders, body: jsonEncode(reqBody));
+  // Get Branch Pages
+  Future<ApiResponse<List<dynamic>>> getBranchPages() async {
+    return await _biddingService.getBranchPages();
+  }
 
-    // success
-    if (res.statusCode == 200) {
-      return true;
-    }
-    // failure
-    else {
-      return false;
-    }
+  // Get Collateral Data
+  Future<ApiResponse<List<dynamic>>> getCollateralData() async {
+    return await _biddingService.getCollateralData();
+  }
+
+  // Get Announcements
+  Future<ApiResponse<List<dynamic>>> getAnnouncements() async {
+    return await _biddingService.getAnnouncements();
   }
 }

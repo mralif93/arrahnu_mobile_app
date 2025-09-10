@@ -68,10 +68,12 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void fetchProfile() async {
-    final res = await AuthController().getUserProfile();
-    setState(() {
-      profile = res;
-    });
+    final response = await AuthController().getUserProfile();
+    if (response.isSuccess && response.data != null) {
+      setState(() {
+        profile = response.data!;
+      });
+    }
   }
 
   void signOutUser() {
@@ -83,10 +85,10 @@ class _DashboardPageState extends State<DashboardPage> {
       onConfirm: () async {
         // signout user session
         try {
-          final res = await AuthController().logout();
+          final response = await AuthController().logout();
 
           // success signout
-          if (res) {
+          if (response.isSuccess && response.data == true) {
             Get.offAll(const NavigationPage());
           }
         } on Exception catch (e) {

@@ -22,23 +22,30 @@ class _BiddingPageState extends State<BiddingPage> {
   // function to fetch data from api and return future list of biddings
   static Future<List<Bidding>> getBiddings() async {
     final response = await AuthController().getUserBidding();
-    final List body = json.decode(response);
-    return body.map((e) => Bidding.fromJson(e)).toList();
+    if (response.isSuccess && response.data != null) {
+      return response.data!.map((e) => Bidding.fromJson(e)).toList();
+    }
+    return [];
   }
 
   // get matching ID for title page
   Future getAccountBiddings() async {
     final response1 = await AuthController().getUserBidding();
     final response2 = await AuthController().getBiddingAccounts();
-    var jsonData1 = jsonDecode(response1);
-    var jsonData2 = jsonDecode(response2);
+    
+    if (!response1.isSuccess || !response2.isSuccess) {
+      return;
+    }
+    
+    var jsonData1 = response1.data!;
+    var jsonData2 = response2.data!;
 
     if (jsonData1.length > 0) {
       for (var k = 0; k < jsonData1.length; k++) {
-        if (jsonData2['items'].length > 0) {
-          for (var i = 0; i < jsonData2['items'].length; i++) {
-            if (jsonData1[k]['product'] == jsonData2['items'][i]['id']) {
-              jsonData1[k]['title'] = jsonData2['items'][i]['title'];
+        if (jsonData2.length > 0) {
+          for (var i = 0; i < jsonData2.length; i++) {
+            if (jsonData1[k]['product'] == jsonData2[i]['id']) {
+              jsonData1[k]['title'] = jsonData2[i]['title'];
             }
           }
         }

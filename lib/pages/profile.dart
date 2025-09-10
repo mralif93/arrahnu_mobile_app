@@ -60,25 +60,27 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void fetchProfile() async {
-    final res = await AuthController().getUserProfile();
-    setState(() {
-      profile = res;
+    final response = await AuthController().getUserProfile();
+    if (response.isSuccess && response.data != null) {
+      setState(() {
+        profile = response.data!;
 
-      // assign value
-      fullnameController.text = profile.fullName.toUpperCase();
-      identificationController.text = profile.idNum.toString();
-      mobileController.text = profile.hpNumber.toString();
-      addressController.text = profile.address.toString();
-      postcodeController.text = profile.postalCode.toString();
-      cityController.text = profile.city.toUpperCase();
-      stateController.text = profile.state.toUpperCase();
-      countryController.text = profile.country.toUpperCase();
-    });
+        // assign value
+        fullnameController.text = profile.fullName.toUpperCase();
+        identificationController.text = profile.idNum.toString();
+        mobileController.text = profile.hpNumber.toString();
+        addressController.text = profile.address.toString();
+        postcodeController.text = profile.postalCode.toString();
+        cityController.text = profile.city.toUpperCase();
+        stateController.text = profile.state.toUpperCase();
+        countryController.text = profile.country.toUpperCase();
+      });
+    }
     // print("Failed to fetch profile!");
   }
 
   void updateProfile() async {
-    final res = await AuthController().updateUserProfile(
+    final response = await AuthController().updateUserProfile(
       profile.id,
       fullnameController.text.toString(),
       identificationController.text.toString(),
@@ -91,7 +93,7 @@ class _ProfilePageState extends State<ProfilePage> {
       int.parse(profile.user.toString()),
     );
 
-    if (res) {
+    if (response.isSuccess) {
       Get.defaultDialog(
         title: Variables.successTitle,
         middleText: Variables.profileUpdatedText,

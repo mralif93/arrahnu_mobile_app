@@ -225,16 +225,15 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     try {
-      final resp = await AuthController().login(username, password);
-      // Map<String, dynamic> data = jsonDecode(resp.body);
+      final response = await AuthController().login(username, password);
 
-      if (resp.statusCode == 200) {
-        // reset input
+      // Pop the loading circle
+      Navigator.of(context).pop();
+
+      if (response.isSuccess) {
+        // Reset input
         _emailController.clear();
         _passwordController.clear();
-
-        //  pop the loading circle
-        Navigator.of(context).pop();
 
         // Navigate to dashboard
         Navigator.pushAndRemoveUntil(
@@ -243,16 +242,13 @@ class _LoginPageState extends State<LoginPage> {
           (route) => false,
         );
       } else {
-        //  pop the loading circle
-        Navigator.of(context).pop();
-
         // Display error message
         await showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
             title: const Text('Unable to log in'),
-            content: const Text(
-                'An unexpected error occurred. Please try loggin in again. If the problem persists, please contact support.'),
+            content: Text(response.error?.userMessage ?? 
+                'An unexpected error occurred. Please try logging in again. If the problem persists, please contact support.'),
             actions: [
               ElevatedButton(
                 onPressed: () {
@@ -265,7 +261,25 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
-      print(e);
+      // Pop the loading circle
+      Navigator.of(context).pop();
+      
+      // Display error message
+      await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Error'),
+          content: Text('An unexpected error occurred: ${e.toString()}'),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            )
+          ],
+        ),
+      );
     }
   }
 }
