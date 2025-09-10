@@ -142,77 +142,293 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          'Dashboard',
+          style: TextStyle(
+            color: Colors.grey[800],
+            fontSize: 24,
+            fontWeight: FontWeight.w300,
+            letterSpacing: -0.5,
+          ),
+        ),
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                // my avatar
-                QAvatar(
-                  name: profile.fullName,
-                  mobile: '+60${profile.hpNumber}',
-                  image:
-                      Variables.defaultAvatarUrl,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            children: [
+              // Welcome message
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.orange[50],
+                  borderRadius: BorderRadius.circular(16),
                 ),
-
-                // sQpace
-                const SizedBox(height: 16),
-
-                // my profile
-                QListTiles(
-                  text: 'My Profile',
-                  onTap: () {
-                    Get.to(const ProfilePage());
-                  },
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.dashboard_outlined,
+                      size: 48,
+                      color: Colors.orange[600],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Welcome to Dashboard',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w300,
+                        color: Colors.orange[800],
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Manage your account and bidding activities',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.orange[700],
+                        fontWeight: FontWeight.w400,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
+              ),
 
-                // space
-                const SizedBox(height: 16),
+              const SizedBox(height: 32),
 
-                // my bidding
-                QListTiles(
-                  text: 'My Bidding',
-                  onTap: () {
-                    Get.to(const BiddingPage());
-                  },
+              // User avatar section
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.grey[200]!),
                 ),
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Colors.orange[100],
+                      backgroundImage: NetworkImage(Variables.defaultAvatarUrl),
+                      child: profile.fullName.isNotEmpty
+                          ? Text(
+                              profile.fullName.isNotEmpty
+                                  ? profile.fullName[0].toUpperCase()
+                                  : 'U',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.orange[800],
+                              ),
+                            )
+                          : Icon(
+                              Icons.person,
+                              size: 40,
+                              color: Colors.orange[600],
+                            ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      profile.fullName.isNotEmpty ? profile.fullName : 'User',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '+60${profile.hpNumber}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
-                // space
-                const SizedBox(height: 16),
+              const SizedBox(height: 32),
 
-                if (statusView)
-                  // my bidding
-                  QListTiles(
-                    text: 'Bidding Now !!',
-                    onTap: () {
-                      Get.to(const BranchPage());
-                    },
+              // Menu items
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.grey[200]!),
+                ),
+                child: Column(
+                  children: [
+                    // My Profile
+                    ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 8,
+                      ),
+                      leading: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.blue[50],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.person_outline,
+                          color: Colors.blue[600],
+                          size: 20,
+                        ),
+                      ),
+                      title: Text(
+                        'My Profile',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.grey[400],
+                        size: 16,
+                      ),
+                      onTap: () {
+                        Get.to(const ProfilePage());
+                      },
+                    ),
+                    
+                    Divider(
+                      color: Colors.grey[200],
+                      height: 1,
+                      indent: 24,
+                      endIndent: 24,
+                    ),
+                    
+                    // My Bidding
+                    ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 8,
+                      ),
+                      leading: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.green[50],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.gavel_outlined,
+                          color: Colors.green[600],
+                          size: 20,
+                        ),
+                      ),
+                      title: Text(
+                        'My Bidding',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.grey[400],
+                        size: 16,
+                      ),
+                      onTap: () {
+                        Get.to(const BiddingPage());
+                      },
+                    ),
+
+                    if (statusView) ...[
+                      Divider(
+                        color: Colors.grey[200],
+                        height: 1,
+                        indent: 24,
+                        endIndent: 24,
+                      ),
+                      
+                      // Bidding Now
+                      ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 8,
+                        ),
+                        leading: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.red[50],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.flash_on,
+                            color: Colors.red[600],
+                            size: 20,
+                          ),
+                        ),
+                        title: Text(
+                          'Bidding Now !!',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.grey[400],
+                          size: 16,
+                        ),
+                        onTap: () {
+                          Get.to(const BranchPage());
+                        },
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 48),
+
+              // Sign out button
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: signOutUser,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red[50],
+                    foregroundColor: Colors.red[600],
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.red[200]!),
+                    ),
                   ),
-
-                // space
-                const SizedBox(height: 16),
-              ],
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                // button sign out
-                QButton(
-                  text: 'Sign Out',
-                  onTap: signOutUser,
+                  child: const Text(
+                    'Sign Out',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
                 ),
+              ),
 
-                // space
-                const SizedBox(height: 25),
-              ],
-            ),
-          ],
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       ),
     );
