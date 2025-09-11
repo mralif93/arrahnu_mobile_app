@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'collateral_selection_page.dart';
+import '../constant/variables.dart';
 
 class AccountSelectionPage extends StatefulWidget {
   final String selectedBranch;
@@ -17,6 +20,64 @@ class AccountSelectionPage extends StatefulWidget {
 }
 
 class _AccountSelectionPageState extends State<AccountSelectionPage> {
+  Map<String, int> accountCollateralCounts = {};
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCollateralData();
+  }
+
+  Future<void> _fetchCollateralData() async {
+    try {
+      final response = await http.get(
+        Uri.parse('${Variables.baseUrl}/api/collateral/'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        
+        print('🔍 API Response length: ${data.length}');
+        print('🔍 Selected branch: ${widget.selectedBranch}');
+        print('🔍 First few items: ${data.take(3).toList()}');
+        
+        // Count collateral items per account
+        Map<String, int> counts = {};
+        for (var item in data) {
+          final branch = item['page']?['branch']?['title'] as String?;
+          final account = item['page']?['acc_num'] as String?;
+          
+          print('🔍 Item branch: "$branch", account: "$account"');
+          
+          if (branch == widget.selectedBranch && account != null) {
+            counts[account] = (counts[account] ?? 0) + 1;
+            print('🔍 Added count for account: $account, total: ${counts[account]}');
+          }
+        }
+        
+        print('🔍 Final counts: $counts');
+        
+        setState(() {
+          accountCollateralCounts = counts;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching collateral data: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -48,36 +109,55 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: accounts.isEmpty
+      body: isLoading
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.account_balance_wallet_outlined,
-                    size: 64 * scaleFactor,
-                    color: Colors.grey[400],
+                  CircularProgressIndicator(
+                    color: const Color(0xFFFE8000),
                   ),
                   SizedBox(height: 16 * scaleFactor),
                   Text(
-                    'No accounts available',
+                    'Loading accounts...',
                     style: TextStyle(
                       fontSize: 16 * scaleFactor,
-                      fontWeight: FontWeight.w600,
                       color: Colors.grey[600],
-                    ),
-                  ),
-                  SizedBox(height: 8 * scaleFactor),
-                  Text(
-                    'This branch has no accounts',
-                    style: TextStyle(
-                      fontSize: 12 * scaleFactor,
-                      color: Colors.grey[500],
                     ),
                   ),
                 ],
               ),
             )
+          : accounts.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.account_balance_wallet_outlined,
+                        size: 64 * scaleFactor,
+                        color: Colors.grey[400],
+                      ),
+                      SizedBox(height: 16 * scaleFactor),
+                      Text(
+                        'No accounts available',
+                        style: TextStyle(
+                          fontSize: 16 * scaleFactor,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      SizedBox(height: 8 * scaleFactor),
+                      Text(
+                        'This branch has no accounts',
+                        style: TextStyle(
+                          fontSize: 12 * scaleFactor,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                    ],
+                  ),
+                )
           : Padding(
               padding: EdgeInsets.all(16 * scaleFactor),
               child: Column(
@@ -202,6 +282,21 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
                                           fontSize: 12 * scaleFactor,
                                           fontWeight: FontWeight.w600,
                                           color: Colors.grey[800],
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 8 * scaleFactor, vertical: 4 * scaleFactor),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green[600]!.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8 * scaleFactor),
+                                      ),
+                                      child: Text(
+                                        '${accountCollateralCounts[accountNumber] ?? 0}',
+                                        style: TextStyle(
+                                          fontSize: 10 * scaleFactor,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.green[600],
                                         ),
                                       ),
                                     ),
