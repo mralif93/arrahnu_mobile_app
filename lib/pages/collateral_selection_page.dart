@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../constant/variables.dart';
+import 'collateral_details_page.dart';
 
 class CollateralSelectionPage extends StatefulWidget {
   final String selectedBranch;
@@ -395,7 +396,16 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
-                // Handle item tap
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CollateralDetailsPage(
+                      collateralItem: item,
+                      selectedBranch: widget.selectedBranch,
+                      selectedAccount: widget.selectedAccount,
+                    ),
+                  ),
+                );
               },
               borderRadius: BorderRadius.circular(12 * scaleFactor),
               child: Container(
