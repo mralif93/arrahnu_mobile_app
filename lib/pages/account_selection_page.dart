@@ -29,7 +29,7 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: Text(
-          'Select Account',
+          'Account',
           style: TextStyle(
             fontSize: 18 * scaleFactor,
             fontWeight: FontWeight.w600,

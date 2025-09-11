@@ -93,7 +93,7 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: Text(
-          'Items Available',
+          'Collateral',
           style: TextStyle(
             fontSize: 18 * scaleFactor,
             fontWeight: FontWeight.w600,
