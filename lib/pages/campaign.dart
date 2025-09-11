@@ -7,7 +7,7 @@ import 'dart:convert';
 
 import '../components/QCard.dart';
 import '../constant/variables.dart';
-import 'home.dart';
+import 'bidding_flow.dart';
 import 'account.dart';
 import 'dashboard.dart';
 import 'login.dart';
@@ -155,10 +155,10 @@ class _CampaignPageState extends State<CampaignPage> {
                     scrollDirection: Axis.horizontal,
                     children: [
                       _buildActionCard(
-                        icon: Icons.gavel_outlined,
-                        title: 'Bidding',
+                        icon: Icons.search_outlined,
+                        title: 'Browse',
                         color: const Color(0xFF3B82F6),
-                        onTap: () => Get.to(const HomePage()),
+                            onTap: () => Get.to(const BiddingFlowPage()),
                       ),
                       const SizedBox(width: 12),
                       _buildActionCard(
