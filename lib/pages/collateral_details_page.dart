@@ -46,6 +46,10 @@ class _CollateralDetailsPageState extends State<CollateralDetailsPage> {
     final double scaleFactor = (screenWidth / 375).clamp(0.8, 1.2);
 
     try {
+      // Debug: Print all available fields
+      print('🔍 Collateral item keys: ${widget.collateralItem.keys.toList()}');
+      print('🔍 Full collateral item: $widget.collateralItem');
+      
       // Extract data from collateral item
     final category = widget.collateralItem['category'] as String? ?? 'N/A';
     final title = widget.collateralItem['title'] as String? ?? 'N/A';
@@ -75,6 +79,7 @@ class _CollateralDetailsPageState extends State<CollateralDetailsPage> {
     final calculatedBeforePrice = priceBeforeDiscount ?? 
                                 (priceAfterDiscount != null && discount != null ? 
                                  priceAfterDiscount + discount : null);
+
 
     // Images - Extract URLs from HTML strings
     final imagesRaw = widget.collateralItem['images'] as List<dynamic>? ?? [];
@@ -302,6 +307,7 @@ class _CollateralDetailsPageState extends State<CollateralDetailsPage> {
                 ],
               ),
             ),
+
 
             // Images Card (always show, even if no images)
             SizedBox(height: 16 * scaleFactor),

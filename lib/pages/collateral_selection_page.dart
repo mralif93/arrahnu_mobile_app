@@ -20,6 +20,7 @@ class CollateralSelectionPage extends StatefulWidget {
 
 class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
   List<dynamic> collections = [];
+  String? accountImageUrl;
   bool isLoading = true;
 
   @override
@@ -41,8 +42,37 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
       
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        
+        // Extract account image from the first matching item
+        String? imageUrl;
+        for (var item in data) {
+          final branch = item['page']?['branch']?['title'] as String?;
+          final account = item['page']?['acc_num'] as String?;
+          
+          if (branch == widget.selectedBranch && account == widget.selectedAccount) {
+            final accountImage = item['page']?['account_image'];
+            
+            if (accountImage != null && accountImage['url'] != null) {
+              imageUrl = accountImage['url'] as String;
+              
+              // Test if the image URL is accessible
+              try {
+                final testResponse = await http.head(Uri.parse('${Variables.baseUrl}$imageUrl'));
+                if (testResponse.statusCode == 200) {
+                  break;
+                } else {
+                  imageUrl = null; // Reset if not accessible
+                }
+              } catch (e) {
+                imageUrl = null; // Reset if test fails
+              }
+            }
+          }
+        }
+        
         setState(() {
           collections = data; // The API returns the list directly, not wrapped in a 'data' property
+          accountImageUrl = imageUrl;
           isLoading = false;
         });
       } else {
@@ -233,7 +263,7 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
                           ],
                         ),
                         
-                        SizedBox(height: 16 * scaleFactor),
+                        SizedBox(height: 12 * scaleFactor),
                         
                         // Clean Summary Statistics
                         Container(
@@ -291,6 +321,119 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
                       ],
                     ),
                   ),
+                  
+                  // Account Image Section
+                  SizedBox(height: 1 * scaleFactor),
+                  
+                  Container(
+                    width: double.infinity,
+                    height: 200 * scaleFactor,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12 * scaleFactor),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12 * scaleFactor),
+                      child: accountImageUrl != null
+                          ? Image.network(
+                              '${Variables.baseUrl}$accountImageUrl',
+                              fit: BoxFit.cover,
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Container(
+                                  color: Colors.grey[50],
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded / 
+                                            loadingProgress.expectedTotalBytes!
+                                          : null,
+                                      color: const Color(0xFFFE8000),
+                                    ),
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                // Check if it's a 404 error
+                                bool is404 = error.toString().contains('404') || 
+                                           error.toString().contains('Not Found') ||
+                                           error.toString().contains('HttpException');
+                                
+                                return Container(
+                                  color: Colors.grey[50],
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        is404 ? Icons.image_not_supported : Icons.error_outline,
+                                        color: Colors.grey[400],
+                                        size: 32 * scaleFactor,
+                                      ),
+                                      SizedBox(height: 8 * scaleFactor),
+                                      Text(
+                                        is404 ? 'Account image not available' : 'Failed to load account image',
+                                        style: TextStyle(
+                                          fontSize: 12 * scaleFactor,
+                                          color: Colors.grey[500],
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4 * scaleFactor),
+                                      Text(
+                                        'Account: ${widget.selectedAccount}',
+                                        style: TextStyle(
+                                          fontSize: 10 * scaleFactor,
+                                          color: Colors.grey[400],
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            )
+                          : Container(
+                              color: Colors.white,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.account_balance_wallet,
+                                    color: Colors.grey[400],
+                                    size: 48 * scaleFactor,
+                                  ),
+                                  SizedBox(height: 12 * scaleFactor),
+                                  Text(
+                                    'No account image available',
+                                    style: TextStyle(
+                                      fontSize: 14 * scaleFactor,
+                                      color: Colors.grey[500],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4 * scaleFactor),
+                                  Text(
+                                    'Account: ${widget.selectedAccount}',
+                                    style: TextStyle(
+                                      fontSize: 12 * scaleFactor,
+                                      color: Colors.grey[400],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                    ),
+                  ),
+                  
+                  SizedBox(height: 18 * scaleFactor),
                   
                   // Enhanced Items List
                   Expanded(
@@ -360,7 +503,7 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
     }
 
     return ListView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 1 * scaleFactor, vertical: 8 * scaleFactor),
+      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
       itemCount: filteredCollaterals.length,
       itemBuilder: (context, index) {
         final item = filteredCollaterals[index];
@@ -391,7 +534,7 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
 
         return AnimatedContainer(
           duration: Duration(milliseconds: 300 + (index * 50)),
-          margin: EdgeInsets.only(bottom: 8 * scaleFactor),
+          margin: EdgeInsets.only(bottom: 12 * scaleFactor),
           child: Material(
             color: Colors.transparent,
             child: InkWell(

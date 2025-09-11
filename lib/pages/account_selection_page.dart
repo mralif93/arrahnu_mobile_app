@@ -21,6 +21,7 @@ class AccountSelectionPage extends StatefulWidget {
 
 class _AccountSelectionPageState extends State<AccountSelectionPage> {
   Map<String, int> accountCollateralCounts = {};
+  Map<String, String> accountImages = {};
   bool isLoading = true;
 
   @override
@@ -45,24 +46,37 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
         print('🔍 Selected branch: ${widget.selectedBranch}');
         print('🔍 First few items: ${data.take(3).toList()}');
         
-        // Count collateral items per account
+        // Count collateral items per account and collect account images
         Map<String, int> counts = {};
+        Map<String, String> images = {};
+        
         for (var item in data) {
           final branch = item['page']?['branch']?['title'] as String?;
           final account = item['page']?['acc_num'] as String?;
+          final accountImage = item['page']?['account_image'];
           
           print('🔍 Item branch: "$branch", account: "$account"');
+          print('🔍 Account image data: $accountImage');
           
           if (branch == widget.selectedBranch && account != null) {
             counts[account] = (counts[account] ?? 0) + 1;
             print('🔍 Added count for account: $account, total: ${counts[account]}');
+            
+            // Extract account image URL
+            if (accountImage != null && accountImage['url'] != null) {
+              final imageUrl = accountImage['url'] as String;
+              images[account] = imageUrl;
+              print('🔍 Added image for account: $account, image: $imageUrl');
+            }
           }
         }
         
         print('🔍 Final counts: $counts');
+        print('🔍 Final images: $images');
         
         setState(() {
           accountCollateralCounts = counts;
+          accountImages = images;
           isLoading = false;
         });
       } else {
@@ -262,17 +276,56 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
                                 ),
                                 child: Row(
                                   children: [
+                                    // Account Image or Icon
                                     Container(
-                                      padding: EdgeInsets.all(6 * scaleFactor),
+                                      width: 40 * scaleFactor,
+                                      height: 40 * scaleFactor,
                                       decoration: BoxDecoration(
-                                        color: Colors.blue[600]!.withOpacity(0.1),
-                                        shape: BoxShape.circle,
+                                        borderRadius: BorderRadius.circular(8 * scaleFactor),
+                                        border: Border.all(color: Colors.grey[300]!),
                                       ),
-                                      child: Icon(
-                                        Icons.account_balance_wallet,
-                                        color: Colors.blue[600],
-                                        size: 18 * scaleFactor,
-                                      ),
+                                      child: accountImages[accountNumber] != null
+                                          ? ClipRRect(
+                                              borderRadius: BorderRadius.circular(8 * scaleFactor),
+                                              child: Image.network(
+                                                '${Variables.baseUrl}${accountImages[accountNumber]}',
+                                                fit: BoxFit.cover,
+                                                loadingBuilder: (context, child, loadingProgress) {
+                                                  if (loadingProgress == null) return child;
+                                                  return Container(
+                                                    color: Colors.grey[200],
+                                                    child: Center(
+                                                      child: SizedBox(
+                                                        width: 16 * scaleFactor,
+                                                        height: 16 * scaleFactor,
+                                                        child: CircularProgressIndicator(
+                                                          strokeWidth: 2,
+                                                          color: const Color(0xFFFE8000),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                errorBuilder: (context, error, stackTrace) {
+                                                  return Container(
+                                                    color: Colors.blue[600]!.withOpacity(0.1),
+                                                    child: Icon(
+                                                      Icons.account_balance_wallet,
+                                                      color: Colors.blue[600],
+                                                      size: 18 * scaleFactor,
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            )
+                                          : Container(
+                                              color: Colors.blue[600]!.withOpacity(0.1),
+                                              child: Icon(
+                                                Icons.account_balance_wallet,
+                                                color: Colors.blue[600],
+                                                size: 18 * scaleFactor,
+                                              ),
+                                            ),
                                     ),
                                     SizedBox(width: 12 * scaleFactor),
                                     Expanded(
