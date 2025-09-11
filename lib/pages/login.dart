@@ -8,7 +8,7 @@ import '../components/QTextField.dart';
 import '../constant/style.dart';
 import '../constant/variables.dart';
 import '../controllers/authorization.dart';
-import '../pages/navigation.dart';
+import '../pages/campaign.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -55,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
         if (mounted) {
           Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const NavigationPageWithAccountTab()),
+              MaterialPageRoute(builder: (context) => const CampaignPage()),
               (route) => false);
         }
       }
@@ -366,10 +366,10 @@ class _LoginPageState extends State<LoginPage> {
           _emailController.clear();
           _passwordController.clear();
 
-          // Navigate to NavigationPage with Account tab selected
+          // Navigate to Campaign page
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const NavigationPageWithAccountTab()),
+            MaterialPageRoute(builder: (context) => const CampaignPage()),
             (route) => false,
           );
         } else {

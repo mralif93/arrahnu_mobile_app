@@ -13,6 +13,9 @@ import 'biddings.dart';
 import 'branch.dart';
 import 'navigation.dart';
 import 'profile.dart';
+import 'home.dart';
+import 'prices.dart';
+import 'calculator.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -50,19 +53,10 @@ class _DashboardPageState extends State<DashboardPage> {
   void checkSession() async {
     final res = await AuthController().session();
     if (!res) {
-      Get.to(const NavigationPage());
-
-      // Show snackbar
-      final snackBar = SnackBar(
-        content: const Text('Session Timeout!'),
-        action: SnackBarAction(
-          label: 'Dismiss',
-          onPressed: () {
-            // Some code to undo the change.
-          },
-        ),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => NavigationPage()),
+          (route) => false);
       return;
     }
   }
@@ -76,360 +70,507 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  void signOutUser() {
-    Get.defaultDialog(
-      title: 'Sign Out',
-      middleText: 'Are you sure you want to sign out?',
-      textConfirm: 'Yes',
-      textCancel: 'No',
-      onConfirm: () async {
-        // signout user session
-        try {
-          final response = await AuthController().logout();
+  void _showLogoutDialog() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Sign Out'),
+        content: const Text('Are you sure you want to sign out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Get.back();
+              try {
+                final response = await AuthController().logout();
 
-          // success signout
-          if (response.isSuccess && response.data == true) {
-            Get.offAll(const NavigationPage());
-          }
-        } on Exception catch (e) {
-          print(e);
-        }
-      },
-      onCancel: () {},
+                // success signout
+                if (response.isSuccess && response.data == true) {
+                  Get.offAll(const NavigationPage());
+                }
+              } on Exception catch (e) {
+                print(e);
+              }
+            },
+            child: const Text('Sign Out'),
+          ),
+        ],
+      ),
     );
   }
 
-  Future checkBidingTime() async {
-    // Get data from API
-    var response = await http.get(Uri.parse(
-        '${Variables.baseUrl}/api/v2/pages/?type=product.BranchIndexPage&fields=*'));
-    if (response.statusCode == 200) {
-      // Parse JSON to Dart object
-      Map<String, dynamic> jsonData = jsonDecode(response.body);
+  void checkBidingTime() async {
+    try {
+      var response = await http.get(Uri.parse(
+          '${Variables.baseUrl}/api/v2/pages/?type=product.BranchIndexPage&fields=*'));
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonData = jsonDecode(response.body);
+        var items = jsonData['items'];
+        if (items.isNotEmpty) {
+          var startDate = DateTime.parse(items[0]['start_bidding_session']);
+          var endDate = DateTime.parse(items[0]['end_bidding_session']);
+          var currentDate = DateTime.now();
 
-      var currentDate = DateTime.now();
-      var startDate =
-          DateTime.parse(jsonData['items'][0]["start_bidding_session"]);
-      var endDate = DateTime.parse(jsonData['items'][0]["end_bidding_session"]);
-
-      print(startDate);
-      print(endDate);
-      print(currentDate.compareTo(startDate));
-      print(currentDate.compareTo(endDate));
-
-      if (currentDate.compareTo(startDate) == 1 &&
-          currentDate.compareTo(endDate) == 1) {
-        print('Waiting for Bidding!');
-        setState(() {
-          statusView = false;
-        });
-      } else if (currentDate.compareTo(startDate) == 1 &&
-          currentDate.compareTo(endDate) == -1) {
-        print('Bidding on Progress!');
-        setState(() {
-          statusView = true;
-        });
-      } else if (currentDate.compareTo(startDate) == -1 &&
-          currentDate.compareTo(endDate) == -1) {
-        print('Already Done Bidding!');
-        setState(() {
-          statusView = false;
-        });
+          if (currentDate.compareTo(startDate) == 1 &&
+              currentDate.compareTo(endDate) == -1) {
+            print('Bidding is active!');
+            setState(() {
+              statusView = true;
+            });
+          } else if (currentDate.compareTo(startDate) == -1) {
+            print('Bidding has not started yet!');
+            setState(() {
+              statusView = false;
+            });
+          } else if (currentDate.compareTo(endDate) == 1 ||
+              currentDate.compareTo(endDate) == 0) {
+            print('Already Done Bidding!');
+            setState(() {
+              statusView = false;
+            });
+          }
+        }
       }
+    } catch (e) {
+      print('Error checking bidding time: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Calculate responsive font sizes
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double scaleFactor = (screenWidth / 375).clamp(0.4, 0.7);
+    
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFFE8000),
+        foregroundColor: Colors.white,
         elevation: 0,
         title: Text(
-          'Dashboard',
+          'Bidding Dashboard',
           style: TextStyle(
-            color: Colors.grey[800],
-            fontSize: 24,
-            fontWeight: FontWeight.w300,
-            letterSpacing: -0.5,
+            fontSize: (20 * scaleFactor).toDouble(),
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
       ),
-      body: SafeArea(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {
+            fetchProfile();
+            checkBidingTime();
+          });
+        },
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(32.0),
+          physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
-              // Welcome message
+              // Add top padding for status bar
+              SizedBox(height: MediaQuery.of(context).padding.top),
+              
+              // Welcome Header
               Container(
                 width: double.infinity,
+                margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.orange[50],
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.dashboard_outlined,
-                      size: 48,
-                      color: Colors.orange[600],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Welcome to Dashboard',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w300,
-                        color: Colors.orange[800],
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Manage your account and bidding activities',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.orange[700],
-                        fontWeight: FontWeight.w400,
-                      ),
-                      textAlign: TextAlign.center,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      const Color(0xFFFE8000),
+                      const Color(0xFFE67300),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFE8000).withOpacity(0.3),
+                      spreadRadius: 2,
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // User avatar section
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey[200]!),
-                ),
                 child: Column(
                   children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Colors.orange[100],
-                      backgroundImage: NetworkImage(Variables.defaultAvatarUrl),
-                      child: profile.fullName.isNotEmpty
-                          ? Text(
-                              profile.fullName.isNotEmpty
-                                  ? profile.fullName[0].toUpperCase()
-                                  : 'U',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.orange[800],
-                              ),
-                            )
-                          : Icon(
-                              Icons.person,
-                              size: 40,
-                              color: Colors.orange[600],
-                            ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      profile.fullName.isNotEmpty ? profile.fullName : 'User',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '+60${profile.hpNumber}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Menu items
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey[200]!),
-                ),
-                child: Column(
-                  children: [
-                    // My Profile
-                    ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 8,
-                      ),
-                      leading: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.blue[50],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.person_outline,
-                          color: Colors.blue[600],
-                          size: 20,
-                        ),
-                      ),
-                      title: Text(
-                        'My Profile',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[800],
-                        ),
-                      ),
-                      trailing: Icon(
-                        Icons.arrow_forward_ios,
-                        color: Colors.grey[400],
-                        size: 16,
-                      ),
-                      onTap: () {
-                        Get.to(const ProfilePage());
-                      },
-                    ),
-                    
-                    Divider(
-                      color: Colors.grey[200],
-                      height: 1,
-                      indent: 24,
-                      endIndent: 24,
-                    ),
-                    
-                    // My Bidding
-                    ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 8,
-                      ),
-                      leading: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.green[50],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.gavel_outlined,
-                          color: Colors.green[600],
-                          size: 20,
-                        ),
-                      ),
-                      title: Text(
-                        'My Bidding',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[800],
-                        ),
-                      ),
-                      trailing: Icon(
-                        Icons.arrow_forward_ios,
-                        color: Colors.grey[400],
-                        size: 16,
-                      ),
-                      onTap: () {
-                        Get.to(const BiddingPage());
-                      },
-                    ),
-
-                    if (statusView) ...[
-                      Divider(
-                        color: Colors.grey[200],
-                        height: 1,
-                        indent: 24,
-                        endIndent: 24,
-                      ),
-                      
-                      // Bidding Now
-                      ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 8,
-                        ),
-                        leading: Container(
-                          width: 40,
-                          height: 40,
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.red[50],
-                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(
-                            Icons.flash_on,
-                            color: Colors.red[600],
-                            size: 20,
+                            Icons.person,
+                            size: (32 * scaleFactor).toDouble(),
+                            color: Colors.white,
                           ),
                         ),
-                        title: Text(
-                          'Bidding Now !!',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey[800],
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Welcome back!',
+                                style: TextStyle(
+                                  fontSize: (16 * scaleFactor).toDouble(),
+                                  color: Colors.white.withOpacity(0.9),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                profile.fullName.isNotEmpty ? profile.fullName : 'Bidding User',
+                                style: TextStyle(
+                                  fontSize: (20 * scaleFactor).toDouble(),
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        trailing: Icon(
-                          Icons.arrow_forward_ios,
-                          color: Colors.grey[400],
-                          size: 16,
-                        ),
-                        onTap: () {
-                          Get.to(const BranchPage());
-                        },
-                      ),
-                    ],
+                      ],
+                    ),
                   ],
                 ),
               ),
-
-              const SizedBox(height: 48),
-
-              // Sign out button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: signOutUser,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red[50],
-                    foregroundColor: Colors.red[600],
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.red[200]!),
+              
+              // Bidding Statistics
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildStatCard(
+                        'Active Bids',
+                        '12',
+                        Icons.gavel,
+                        const Color(0xFF3B82F6),
+                        scaleFactor,
+                      ),
                     ),
-                  ),
-                  child: const Text(
-                    'Sign Out',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildStatCard(
+                        'Won Auctions',
+                        '8',
+                        Icons.emoji_events,
+                        const Color(0xFF10B981),
+                        scaleFactor,
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildStatCard(
+                        'Total Spent',
+                        'RM 45K',
+                        Icons.attach_money,
+                        const Color(0xFF8B5CF6),
+                        scaleFactor,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 32),
+              
+              const SizedBox(height: 24),
+              
+              // Quick Actions
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Quick Actions',
+                      style: TextStyle(
+                        fontSize: (18 * scaleFactor).toDouble(),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[900],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildActionCard(
+                            'Join Live Bidding',
+                            'Participate in active auctions',
+                            Icons.gavel,
+                            const Color(0xFFFE8000),
+                            () => Get.to(const HomePage()),
+                            scaleFactor,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildActionCard(
+                            'My Bidding History',
+                            'View all your bids',
+                            Icons.history,
+                            const Color(0xFF3B82F6),
+                            () => Get.to(const BiddingPage()),
+                            scaleFactor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildActionCard(
+                            'Gold Price',
+                            'Check current rates',
+                            Icons.trending_up,
+                            const Color(0xFF10B981),
+                            () => Get.to(const PricesPage()),
+                            scaleFactor,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildActionCard(
+                            'Calculator',
+                            'Estimate values',
+                            Icons.calculate,
+                            const Color(0xFF06B6D4),
+                            () => Get.to(const CalculatorPage()),
+                            scaleFactor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Recent Activity
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Recent Activity',
+                      style: TextStyle(
+                        fontSize: (18 * scaleFactor).toDouble(),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[900],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildActivityItem(
+                      'Won Gold Ring Auction',
+                      '2 hours ago',
+                      Icons.emoji_events,
+                      Colors.green,
+                      scaleFactor,
+                    ),
+                    _buildActivityItem(
+                      'Placed bid on Silver Chain',
+                      '1 day ago',
+                      Icons.gavel,
+                      Colors.orange,
+                      scaleFactor,
+                    ),
+                    _buildActivityItem(
+                      'Updated profile information',
+                      '3 days ago',
+                      Icons.person,
+                      Colors.blue,
+                      scaleFactor,
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Add bottom padding
+              SizedBox(height: MediaQuery.of(context).padding.bottom + 20),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // Helper method to build stat cards
+  Widget _buildStatCard(String title, String value, IconData icon, Color color, double scaleFactor) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: (20 * scaleFactor).toDouble(),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: (18 * scaleFactor).toDouble(),
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[800],
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: (12 * scaleFactor).toDouble(),
+              color: Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper method to build action cards
+  Widget _buildActionCard(String title, String subtitle, IconData icon, Color color, VoidCallback onTap, double scaleFactor) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: (24 * scaleFactor).toDouble(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: (14 * scaleFactor).toDouble(),
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[800],
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: (11 * scaleFactor).toDouble(),
+                color: Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Helper method to build activity items
+  Widget _buildActivityItem(String title, String time, IconData icon, Color color, double scaleFactor) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: (20 * scaleFactor).toDouble(),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: (14 * scaleFactor).toDouble(),
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[800],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  time,
+                  style: TextStyle(
+                    fontSize: (12 * scaleFactor).toDouble(),
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

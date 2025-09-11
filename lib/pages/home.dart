@@ -2,11 +2,14 @@ import 'package:bmmb_pajak_gadai_i/pages/branch.dart';
 import 'package:bmmb_pajak_gadai_i/pages/calculator.dart';
 import 'package:bmmb_pajak_gadai_i/pages/features.dart';
 import 'package:bmmb_pajak_gadai_i/pages/prices.dart';
+import 'package:bmmb_pajak_gadai_i/pages/biddings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
 import 'package:intl/intl.dart';
+import 'package:get/get.dart';
 import '../constant/variables.dart';
 import '../controllers/authorization.dart';
 
@@ -23,6 +26,8 @@ class _HomePageState extends State<HomePage> {
   List products = [];
   List branches = [];
   bool statusView = false;
+  String _currentTime = '';
+  Map<String, dynamic>? _biddingData;
 
   final _images = [
     Variables.assetProductFeatures,
@@ -34,7 +39,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
+    _currentTime = DateFormat('dd/MM/yyyy hh:mm a').format(DateTime.now());
     checkBidingTime();
   }
 
@@ -44,251 +49,476 @@ class _HomePageState extends State<HomePage> {
     width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-        body: SingleChildScrollView(
+      backgroundColor: const Color(0xFFF8F9FA),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {
+            checkBidingTime();
+          });
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
+              // Add top padding for status bar
+              SizedBox(height: MediaQuery.of(context).padding.top),
+              
+              // Header section with logo
               Container(
-                height: height / 6,
-                width: width,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                child: Column(
                   children: [
-                    Material(
-                      color: Colors.white,
-                      elevation: 4,
-                      shape: const CircleBorder(),
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const FeaturesPage()));
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              border: Border.all(
-                                  color: Colors.deepOrangeAccent, width: 3),
-                              shape: BoxShape.circle,
-                            ),
-                            child:
-                                Image.asset(_images[0], height: 80, width: 80),
-                          )),
+                    Image.asset(
+                      "assets/images/muamalat_logo_01.png",
+                      width: double.infinity,
+                      height: 120,
+                      fit: BoxFit.contain,
                     ),
-                    Material(
-                      color: Colors.white,
-                      elevation: 4,
-                      shape: const CircleBorder(),
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const PricesPage()));
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              border: Border.all(
-                                  color: Colors.deepOrangeAccent, width: 3),
-                              shape: BoxShape.circle,
-                            ),
-                            child:
-                                Image.asset(_images[1], height: 80, width: 80),
-                          )),
-                    ),
-                    Material(
-                      color: Colors.white,
-                      elevation: 4,
-                      shape: const CircleBorder(),
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CalculatorPage()));
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              border: Border.all(
-                                  color: Colors.deepOrangeAccent, width: 3),
-                              shape: BoxShape.circle,
-                            ),
-                            child:
-                                Image.asset(_images[2], height: 80, width: 80),
-                          )),
-                    ),
-                    if (statusView)
-                      Material(
-                        color: Colors.white,
-                        elevation: 4,
-                        shape: const CircleBorder(),
-                        clipBehavior: Clip.antiAliasWithSaveLayer,
-                        child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const BranchPage()));
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                border: Border.all(
-                                    color: Colors.deepOrangeAccent, width: 3),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Image.asset(_images[3],
-                                  height: 80, width: 80),
-                            )),
-                      ),
                   ],
                 ),
               ),
-              Container(
-                  height: height / 1.5,
-                  width: width,
-                  child: FutureBuilder(
-                    future: fetchBiddingInfo(),
-                    builder: (context, snapshot) {
-                      List<Widget> children = [];
 
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        // Show Loading
-                        EasyLoading.instance
-                          ..indicatorType =
-                              EasyLoadingIndicatorType.fadingCircle
-                          ..loadingStyle = EasyLoadingStyle.dark;
-                        EasyLoading.show(status: Variables.pleaseWaitText);
-                      } else if (snapshot.hasError) {
-                        // Dismiss Loading
-                        EasyLoading.dismiss();
-                        final error = snapshot.error.toString();
-                        children = <Widget>[
-                          Center(child: Text(error)),
-                        ];
-                      } else if (snapshot.hasData) {
-                        // Dismiss Loading
-                        EasyLoading.dismiss();
+              const SizedBox(height: 8),
 
-                        final data = snapshot.data;
-                        final startBidding =
-                            DateTime.parse(data[0]["start_bidding_session"])
-                                .toLocal();
-                        final endBidding =
-                            DateTime.parse(data[0]["end_bidding_session"])
-                                .toLocal();
+              // Bidding session cards
+              FutureBuilder(
+                future: fetchBiddingInfo(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Container(
+                      padding: const EdgeInsets.all(40),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFE8000).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: const CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFE8000)),
+                              strokeWidth: 3,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            'Loading bidding information...',
+                            style: TextStyle(
+                              color: Colors.grey[700],
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Container(
+                      padding: const EdgeInsets.all(40),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            size: 40,
+                            color: Colors.red[600],
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            'Unable to Load Data',
+                            style: TextStyle(
+                              color: Colors.red[700],
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Please check your connection and try again',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    );
+                  } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    final data = snapshot.data!;
+                    final startBidding = DateTime.parse(data[0]["start_bidding_session"]).toLocal();
+                    final endBidding = DateTime.parse(data[0]["end_bidding_session"]).toLocal();
+                    final now = DateTime.now();
+                    final timeUntilStart = startBidding.difference(now);
+                    final timeUntilEnd = endBidding.difference(now);
 
-                        children = <Widget>[
-                          Text(Variables.systemTitle,
-                              style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                          Text(Variables.auctionSystemTitle,
-                              style: const TextStyle(fontSize: 12)),
-                          const SizedBox(height: 30),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(Variables.biddingStartText,
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
-                              const SizedBox(height: 5),
-                              Text(DateFormat('EEEE').format(startBidding)),
-                              const SizedBox(height: 5),
-                              Text(DateFormat('dd/MM/yyyy hh:mm a')
-                                  .format(startBidding)),
-                              const SizedBox(height: 15),
-                              Text(Variables.biddingEndText,
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
-                              const SizedBox(height: 5),
-                              Text(DateFormat('EEEE').format(endBidding)),
-                              const SizedBox(height: 5),
-                              Text(DateFormat('dd/MM/yyyy hh:mm a')
-                                  .format(endBidding)),
+                    return Column(
+                      children: [
+                        // Start time card
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey[200]!),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.1),
+                                spreadRadius: 1,
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
                             ],
                           ),
-                        ];
-                      } else {
-                        // Dismiss Loading
-                        EasyLoading.dismiss();
-                        children = <Widget>[
-                          Center(child: Text(Variables.goodStatusText)),
-                        ];
-                      }
-
-                      return Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: children,
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFE8000),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.play_arrow,
+                                  size: 20,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      Variables.biddingStartText,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFFFE8000),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      '${DateFormat('dd/MM/yyyy hh:mm a').format(startBidding)} (${DateFormat('EEEE').format(startBidding)})',
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFFFE8000),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      );
-                    },
-                  )),
+                        
+                        // End time card
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey[200]!),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.1),
+                                spreadRadius: 1,
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFE8000),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.stop,
+                                  size: 20,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      Variables.biddingEndText,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFFFE8000),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      '${DateFormat('dd/MM/yyyy hh:mm a').format(endBidding)} (${DateFormat('EEEE').format(endBidding)})',
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFFFE8000),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      
+                        // Status section
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey[200]!),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.1),
+                                spreadRadius: 1,
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: _getStatusColor(),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.info_outline,
+                                  size: 24,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Bidding Session Status',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      _getStaticStatusText(),
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w700,
+                                        color: _getStatusColor(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Container(
+                      padding: const EdgeInsets.all(40),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.check_circle_outline,
+                            size: 48,
+                            color: Colors.green[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            Variables.goodStatusText,
+                            style: TextStyle(
+                              color: Colors.grey[800],
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                },
+              ),
+              
+              // Bidding Button
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const BiddingPage()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFE8000),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 4,
+                    shadowColor: const Color(0xFFFE8000).withOpacity(0.3),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.gavel,
+                        size: 20,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Enter Bidding',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              // Add bottom padding to extend to device bottom
+              SizedBox(height: MediaQuery.of(context).padding.bottom + 20),
             ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
-  Future checkBidingTime() async {
-    // Get data from API
-    var response = await http.get(Uri.parse(
-        '${Variables.baseUrl}${Variables.apiPagesEndpoint}?type=product.BranchIndexPage&fields=*'));
-    if (response.statusCode == 200) {
-      // Parse JSON to Dart object
-      Map<String, dynamic> jsonData = jsonDecode(response.body);
+  String _formatCountdown(Duration duration) {
+    if (duration.isNegative) {
+      return 'Started';
+    }
+    
+    final days = duration.inDays;
+    final hours = duration.inHours % 24;
+    final minutes = duration.inMinutes % 60;
+    final seconds = duration.inSeconds % 60;
+    
+    return '${days}d ${hours}h ${minutes}m ${seconds}s';
+  }
 
-      var currentDate = DateTime.now();
-      var startDate =
-          DateTime.parse(jsonData['items'][0]["start_bidding_session"]);
-      var endDate = DateTime.parse(jsonData['items'][0]["end_bidding_session"]);
+  String _getStatusText(Duration timeUntilStart, Duration timeUntilEnd) {
+    if (timeUntilStart.isNegative && timeUntilEnd.isNegative) {
+      return 'Bidding Session Has Ended';
+    } else if (timeUntilStart.isNegative && !timeUntilEnd.isNegative) {
+      return 'Ends in: ${_formatCountdown(timeUntilEnd)}';
+    } else {
+      return _formatCountdown(timeUntilStart);
+    }
+  }
 
-      print(startDate);
-      print(endDate);
-      print(currentDate.compareTo(startDate));
-      print(currentDate.compareTo(endDate));
+  Color _getStatusColor() {
+    if (_biddingData != null) {
+      try {
+        final startBidding = DateTime.parse(_biddingData!["start_bidding_session"]).toLocal();
+        final endBidding = DateTime.parse(_biddingData!["end_bidding_session"]).toLocal();
+        final now = DateTime.now();
+        final timeUntilStart = startBidding.difference(now);
+        final timeUntilEnd = endBidding.difference(now);
 
-      if (currentDate.compareTo(startDate) == 1 &&
-          currentDate.compareTo(endDate) == 1) {
-        print(Variables.waitingBiddingText);
-        setState(() {
-          statusView = false;
-        });
-      } else if (currentDate.compareTo(startDate) == 1 &&
-          currentDate.compareTo(endDate) == -1) {
-        print(Variables.biddingProgressText);
-        setState(() {
-          statusView = true;
-        });
-      } else if (currentDate.compareTo(startDate) == -1 &&
-          currentDate.compareTo(endDate) == -1) {
-        print(Variables.biddingDoneText);
-        setState(() {
-          statusView = false;
-        });
+        if (timeUntilStart.isNegative && timeUntilEnd.isNegative) {
+          return Colors.red;
+        } else if (timeUntilStart.isNegative && !timeUntilEnd.isNegative) {
+          return Colors.green;
+        } else {
+          return Colors.orange;
+        }
+      } catch (e) {
+        return Colors.grey;
       }
     }
+    return Colors.grey;
   }
 
-  Future fetchBiddingInfo() async {
-    final response = await AuthController().getBiddingInfo();
-    
-    if (response.isSuccess && response.data != null) {
-      return response.data!;
+  String _getStaticStatusText() {
+    if (_biddingData != null) {
+      try {
+        final startBidding = DateTime.parse(_biddingData!["start_bidding_session"]).toLocal();
+        final endBidding = DateTime.parse(_biddingData!["end_bidding_session"]).toLocal();
+        final now = DateTime.now();
+        final timeUntilStart = startBidding.difference(now);
+        final timeUntilEnd = endBidding.difference(now);
+
+        if (timeUntilStart.isNegative && timeUntilEnd.isNegative) {
+          return 'Session Ended';
+        } else if (timeUntilStart.isNegative && !timeUntilEnd.isNegative) {
+          return 'Live Now';
+        } else {
+          return 'Starting Soon';
+        }
+      } catch (e) {
+        return 'Unknown';
+      }
     }
-    
-    throw Exception(response.error?.userMessage ?? Variables.failedLoadDataText);
+    return 'Unknown';
+  }
+
+  Future<void> checkBidingTime() async {
+    try {
+      var response = await http.get(Uri.parse(
+          '${Variables.baseUrl}/api/v2/pages/?type=product.BranchIndexPage&fields=*'));
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonData = jsonDecode(response.body);
+        var items = jsonData['items'];
+        if (items.isNotEmpty) {
+          setState(() {
+            _biddingData = items[0];
+          });
+        }
+      }
+    } catch (e) {
+      print('Error checking bidding time: $e');
+    }
+  }
+
+  Future<List<dynamic>> fetchBiddingInfo() async {
+    try {
+      final response = await http.get(Uri.parse(
+          '${Variables.baseUrl}/api/v2/pages/?type=product.BranchIndexPage&fields=*'));
+      
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonData = jsonDecode(response.body);
+        items = jsonData['items'];
+        if (items.isNotEmpty) {
+          _biddingData = items[0];
+        }
+        return jsonData['items'];
+      } else {
+        throw Exception('Failed to load data: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to load data: ${e.toString()}');
+    }
   }
 }
