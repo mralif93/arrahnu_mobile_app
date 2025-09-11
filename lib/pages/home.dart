@@ -2,7 +2,7 @@ import 'package:bmmb_pajak_gadai_i/pages/branch.dart';
 import 'package:bmmb_pajak_gadai_i/pages/calculator.dart';
 import 'package:bmmb_pajak_gadai_i/pages/features.dart';
 import 'package:bmmb_pajak_gadai_i/pages/prices.dart';
-import 'package:bmmb_pajak_gadai_i/pages/bidding_flow.dart';
+import 'package:bmmb_pajak_gadai_i/pages/branch_selection_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
@@ -371,7 +371,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const BiddingFlowPage()),
+                      MaterialPageRoute(builder: (context) => const BranchSelectionPage()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
