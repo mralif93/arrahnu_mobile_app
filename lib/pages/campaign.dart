@@ -101,75 +101,125 @@ class _CampaignPageState extends State<CampaignPage> {
 
               const SizedBox(height: 16),
 
-              // Quick Actions
+              // Quick Actions Title
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFE8000).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.flash_on,
+                        color: Color(0xFFFE8000),
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
                     Text(
                       'Quick Actions',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 20,
                         fontWeight: FontWeight.w700,
                         color: Colors.grey[900],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      height: 80,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          _buildActionTile(
-                            icon: Icons.gavel_outlined,
-                            title: 'Bidding',
-                            color: const Color(0xFF3B82F6),
-                            onTap: () => Get.to(const HomePage()),
-                          ),
-                          const SizedBox(width: 12),
-                          _buildActionTile(
-                            icon: Icons.account_circle_outlined,
-                            title: 'Account',
-                            color: const Color(0xFF8B5CF6),
-                            onTap: () => _handleAccountTap(),
-                          ),
-                          const SizedBox(width: 12),
-                          _buildActionTile(
-                            icon: Icons.info_outlined,
-                            title: 'Features',
-                            color: const Color(0xFFF59E0B),
-                            onTap: () => Get.to(const FeaturesPage()),
-                          ),
-                          const SizedBox(width: 12),
-                          _buildActionTile(
-                            icon: Icons.trending_up,
-                            title: 'Gold Price',
-                            color: const Color(0xFF10B981),
-                            onTap: () => Get.to(const PricesPage()),
-                          ),
-                          const SizedBox(width: 12),
-                          _buildActionTile(
-                            icon: Icons.calculate_outlined,
-                            title: 'Calculator',
-                            color: const Color(0xFF06B6D4),
-                            onTap: () => Get.to(const CalculatorPage()),
-                          ),
-                        ],
                       ),
                     ),
                   ],
                 ),
               ),
 
+              const SizedBox(height: 16),
+
+              // Quick Actions Cards - Horizontal Scrollable
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.08),
+                      spreadRadius: 1,
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: SizedBox(
+                  height: 80,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      _buildActionCard(
+                        icon: Icons.gavel_outlined,
+                        title: 'Bidding',
+                        color: const Color(0xFF3B82F6),
+                        onTap: () => Get.to(const HomePage()),
+                      ),
+                      const SizedBox(width: 12),
+                      _buildActionCard(
+                        icon: Icons.account_circle_outlined,
+                        title: 'Account',
+                        color: const Color(0xFF8B5CF6),
+                        onTap: () => _handleAccountTap(),
+                      ),
+                      const SizedBox(width: 12),
+                      _buildActionCard(
+                        icon: Icons.info_outlined,
+                        title: 'Features',
+                        color: const Color(0xFFF59E0B),
+                        onTap: () => Get.to(const FeaturesPage()),
+                      ),
+                      const SizedBox(width: 12),
+                      _buildActionCard(
+                        icon: Icons.trending_up,
+                        title: 'Gold Price',
+                        color: const Color(0xFF10B981),
+                        onTap: () => Get.to(const PricesPage()),
+                      ),
+                      const SizedBox(width: 12),
+                      _buildActionCard(
+                        icon: Icons.calculate_outlined,
+                        title: 'Calculator',
+                        color: const Color(0xFF06B6D4),
+                        onTap: () => Get.to(const CalculatorPage()),
+                      ),
+                      const SizedBox(width: 12),
+                      _buildActionCard(
+                        icon: Icons.location_on_outlined,
+                        title: 'Branches',
+                        color: const Color(0xFFEF4444),
+                        onTap: () => Get.to(const BranchPage()),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
               const SizedBox(height: 32),
 
-              // Campaign carousel
+              // Our Campaigns Title
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFE8000).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.campaign,
+                        color: Color(0xFFFE8000),
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
                     Text(
                       'Our Campaigns',
                       style: TextStyle(
@@ -178,66 +228,98 @@ class _CampaignPageState extends State<CampaignPage> {
                         color: Colors.grey[900],
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    CarouselSlider.builder(
-                      carouselController: _controller,
-                      itemCount: items.length,
-                      itemBuilder: (context, index, realIndex) {
-                        return Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 8),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                spreadRadius: 1,
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Our Campaigns Content
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.08),
+                      spreadRadius: 1,
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    if (items.isEmpty)
+                      Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[200]!),
+                        ),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.campaign_outlined,
+                                size: 48,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'No campaigns available',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Check back later for new promotions',
+                                style: TextStyle(
+                                  color: Colors.grey[500],
+                                  fontSize: 14,
+                                ),
                               ),
                             ],
                           ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Image.network(
-                              items[index]['image'],
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: Colors.grey[300],
-                                  child: const Center(
-                                    child: Icon(
-                                      Icons.error_outline,
-                                      color: Colors.grey,
-                                      size: 50,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                      options: CarouselOptions(
-                        height: 200,
-                        aspectRatio: 1.3,
-                        viewportFraction: 0.8,
-                        initialPage: 0,
-                        enableInfiniteScroll: true,
-                        reverse: false,
-                        autoPlay: true,
-                        autoPlayInterval: const Duration(seconds: 3),
-                        autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                        autoPlayCurve: Curves.fastOutSlowIn,
-                        enlargeCenterPage: true,
-                        onPageChanged: (index, reason) {
-                          setState(() {
-                            _activeIndex = index;
-                          });
+                        ),
+                      )
+                    else
+                      CarouselSlider.builder(
+                        carouselController: _controller,
+                        itemCount: items.length,
+                        itemBuilder: (context, index, realIndex) {
+                          return _buildCampaignCard(items[index], index);
                         },
+                        options: CarouselOptions(
+                          height: 280,
+                          aspectRatio: 1.2,
+                          viewportFraction: 0.85,
+                          initialPage: 0,
+                          enableInfiniteScroll: true,
+                          reverse: false,
+                          autoPlay: true,
+                          autoPlayInterval: const Duration(seconds: 4),
+                          autoPlayAnimationDuration: const Duration(milliseconds: 1000),
+                          autoPlayCurve: Curves.easeInOut,
+                          enlargeCenterPage: true,
+                          onPageChanged: (index, reason) {
+                            setState(() {
+                              _activeIndex = index;
+                            });
+                          },
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Center(child: buildIndicator()),
+                    if (items.isNotEmpty) ...[
+                      const SizedBox(height: 20),
+                      Center(child: buildIndicator()),
+                    ],
                   ],
                 ),
               ),
@@ -252,8 +334,8 @@ class _CampaignPageState extends State<CampaignPage> {
     );
   }
 
-  // Action tile widget
-  Widget _buildActionTile({
+  // Action card widget
+  Widget _buildActionCard({
     required IconData icon,
     required String title,
     required Color color,
@@ -265,11 +347,11 @@ class _CampaignPageState extends State<CampaignPage> {
         width: 80,
         height: 80,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: color.withOpacity(0.15),
               spreadRadius: 1,
               blurRadius: 6,
               offset: const Offset(0, 2),
@@ -281,26 +363,71 @@ class _CampaignPageState extends State<CampaignPage> {
           children: [
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
               child: Icon(
                 icon,
                 color: color,
-                size: 24,
+                size: 28,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
               title,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 10,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[800],
+                color: color,
               ),
               textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Campaign card widget
+  Widget _buildCampaignCard(Map<String, dynamic> campaign, int index) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          children: [
+            // Background Image
+            Positioned.fill(
+              child: Image.network(
+                campaign['image'] ?? '',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          const Color(0xFFFE8000).withOpacity(0.8),
+                          const Color(0xFFFF9500).withOpacity(0.8),
+                        ],
+                      ),
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.image_not_supported,
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            
+            
           ],
         ),
       ),
@@ -313,10 +440,12 @@ class _CampaignPageState extends State<CampaignPage> {
       activeIndex: _activeIndex,
       count: items.length,
       effect: const ExpandingDotsEffect(
-        dotWidth: 8,
-        dotHeight: 8,
+        dotWidth: 10,
+        dotHeight: 10,
         activeDotColor: Color(0xFFFE8000),
         dotColor: Colors.grey,
+        spacing: 8,
+        expansionFactor: 3,
       ),
     );
   }
