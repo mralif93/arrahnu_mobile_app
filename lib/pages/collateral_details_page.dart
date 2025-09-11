@@ -28,6 +28,7 @@ class _CollateralDetailsPageState extends State<CollateralDetailsPage> {
     return null;
   }
 
+
   void _showFullScreenImage(BuildContext context, String imageUrl, int currentIndex, int totalImages) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -307,7 +308,6 @@ class _CollateralDetailsPageState extends State<CollateralDetailsPage> {
                 ],
               ),
             ),
-
 
             // Images Card (always show, even if no images)
             SizedBox(height: 16 * scaleFactor),
