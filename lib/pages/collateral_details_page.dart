@@ -28,6 +28,18 @@ class _CollateralDetailsPageState extends State<CollateralDetailsPage> {
     return null;
   }
 
+  void _showFullScreenImage(BuildContext context, String imageUrl, int currentIndex, int totalImages) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => FullScreenImageViewer(
+          imageUrl: imageUrl,
+          currentIndex: currentIndex,
+          totalImages: totalImages,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -64,8 +76,27 @@ class _CollateralDetailsPageState extends State<CollateralDetailsPage> {
                                 (priceAfterDiscount != null && discount != null ? 
                                  priceAfterDiscount + discount : null);
 
-    // Images
-    final images = widget.collateralItem['images'] as List<dynamic>? ?? [];
+    // Images - Extract URLs from HTML strings
+    final imagesRaw = widget.collateralItem['images'] as List<dynamic>? ?? [];
+    final images = <String>[];
+    
+    for (var imageData in imagesRaw) {
+      if (imageData is String) {
+        // Extract image URL from HTML img tag
+        final RegExp imgRegex = RegExp(r'src="([^"]+)"');
+        final Match? match = imgRegex.firstMatch(imageData);
+        if (match != null) {
+          final imagePath = match.group(1);
+          if (imagePath != null) {
+            images.add(imagePath);
+          }
+        }
+      }
+    }
+    
+    print('🔍 Raw images data: $imagesRaw');
+    print('🔍 Extracted image paths: $images');
+    print('🔍 Images count: ${images.length}');
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -201,13 +232,9 @@ class _CollateralDetailsPageState extends State<CollateralDetailsPage> {
                   ),
                   SizedBox(height: 16 * scaleFactor),
                   
-                  _buildDetailRow('Title', title, scaleFactor),
-                  _buildDetailRow('Category', category, scaleFactor),
                   _buildDetailRow('Gold Type', goldType, scaleFactor),
                   _buildDetailRow('Gold Standard', goldStandard, scaleFactor),
                   _buildDetailRow('Gold Weight', '${goldWeight.toStringAsFixed(2)} grams', scaleFactor),
-                  _buildDetailRow('Precious Stones', preciousStones ? 'Yes' : 'No', scaleFactor),
-                  _buildDetailRow('Remarks', remarks, scaleFactor),
                 ],
               ),
             ),
@@ -276,39 +303,38 @@ class _CollateralDetailsPageState extends State<CollateralDetailsPage> {
               ),
             ),
 
-            if (images.isNotEmpty) ...[
-              SizedBox(height: 16 * scaleFactor),
-              
-              // Images Card
-              Container(
-                padding: EdgeInsets.all(16 * scaleFactor),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12 * scaleFactor),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      spreadRadius: 1,
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
+            // Images Card (always show, even if no images)
+            SizedBox(height: 16 * scaleFactor),
+            
+            Container(
+              padding: EdgeInsets.all(16 * scaleFactor),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12 * scaleFactor),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Images',
+                    style: TextStyle(
+                      fontSize: 16 * scaleFactor,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[800],
                     ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Images',
-                      style: TextStyle(
-                        fontSize: 16 * scaleFactor,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                    SizedBox(height: 16 * scaleFactor),
-                    
-                    // Display images in a grid
-                    GridView.builder(
+                  ),
+                  SizedBox(height: 16 * scaleFactor),
+                  
+                  images.isNotEmpty 
+                      ? GridView.builder(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -319,36 +345,119 @@ class _CollateralDetailsPageState extends State<CollateralDetailsPage> {
                       ),
                       itemCount: images.length,
                       itemBuilder: (context, index) {
-                        final imageUrl = '${Variables.baseUrl}${images[index]}';
-                        return Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8 * scaleFactor),
-                            border: Border.all(color: Colors.grey[300]!),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8 * scaleFactor),
-                            child: Image.network(
-                              imageUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: Colors.grey[200],
-                                  child: Icon(
-                                    Icons.image_not_supported,
-                                    color: Colors.grey[400],
-                                    size: 32 * scaleFactor,
+                        final imagePath = images[index];
+                        final imageUrl = '${Variables.baseUrl}$imagePath';
+                        
+                        print('🔍 Image $index path: $imagePath');
+                        print('🔍 Image $index URL: $imageUrl');
+                        
+                        return GestureDetector(
+                          onTap: () => _showFullScreenImage(context, imageUrl, index + 1, images.length),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8 * scaleFactor),
+                              border: Border.all(color: Colors.grey[300]!),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8 * scaleFactor),
+                              child: Stack(
+                                children: [
+                                  Image.network(
+                                    imageUrl,
+                                    fit: BoxFit.contain,
+                                    loadingBuilder: (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Container(
+                                        color: Colors.grey[200],
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            value: loadingProgress.expectedTotalBytes != null
+                                                ? loadingProgress.cumulativeBytesLoaded / 
+                                                  loadingProgress.expectedTotalBytes!
+                                                : null,
+                                            color: const Color(0xFFFE8000),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      print('❌ Image load error: $error');
+                                      return Container(
+                                        color: Colors.grey[200],
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.image_not_supported,
+                                              color: Colors.grey[400],
+                                              size: 32 * scaleFactor,
+                                            ),
+                                            SizedBox(height: 4 * scaleFactor),
+                                            Text(
+                                              'Failed to load',
+                                              style: TextStyle(
+                                                fontSize: 10 * scaleFactor,
+                                                color: Colors.grey[500],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
                                   ),
-                                );
-                              },
+                                  // Overlay with zoom icon
+                                  Positioned(
+                                    top: 8 * scaleFactor,
+                                    right: 8 * scaleFactor,
+                                    child: Container(
+                                      padding: EdgeInsets.all(4 * scaleFactor),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.6),
+                                        borderRadius: BorderRadius.circular(4 * scaleFactor),
+                                      ),
+                                      child: Icon(
+                                        Icons.zoom_in,
+                                        color: Colors.white,
+                                        size: 16 * scaleFactor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         );
                       },
-                    ),
-                  ],
-                ),
+                    )
+                      : Container(
+                          height: 100 * scaleFactor,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8 * scaleFactor),
+                            border: Border.all(color: Colors.grey[300]!),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.image_not_supported,
+                                color: Colors.grey[400],
+                                size: 32 * scaleFactor,
+                              ),
+                              SizedBox(height: 8 * scaleFactor),
+                              Text(
+                                'No images available',
+                                style: TextStyle(
+                                  fontSize: 12 * scaleFactor,
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                ],
               ),
-            ],
+            ),
           ],
         ),
       ),
@@ -486,6 +595,117 @@ class _CollateralDetailsPageState extends State<CollateralDetailsPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class FullScreenImageViewer extends StatefulWidget {
+  final String imageUrl;
+  final int currentIndex;
+  final int totalImages;
+
+  const FullScreenImageViewer({
+    Key? key,
+    required this.imageUrl,
+    required this.currentIndex,
+    required this.totalImages,
+  }) : super(key: key);
+
+  @override
+  State<FullScreenImageViewer> createState() => _FullScreenImageViewerState();
+}
+
+class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
+  late TransformationController _transformationController;
+  late InteractiveViewer _interactiveViewer;
+
+  @override
+  void initState() {
+    super.initState();
+    _transformationController = TransformationController();
+    _interactiveViewer = InteractiveViewer(
+      transformationController: _transformationController,
+      minScale: 0.5,
+      maxScale: 4.0,
+      child: Image.network(
+        widget.imageUrl,
+        fit: BoxFit.contain,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded / 
+                    loadingProgress.expectedTotalBytes!
+                  : null,
+              color: const Color(0xFFFE8000),
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.image_not_supported,
+                  color: Colors.grey[400],
+                  size: 64,
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'Failed to load image',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _transformationController.dispose();
+    super.dispose();
+  }
+
+  void _resetZoom() {
+    _transformationController.value = Matrix4.identity();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black.withOpacity(0.8),
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text(
+          'Image ${widget.currentIndex} of ${widget.totalImages}',
+          style: TextStyle(color: Colors.white),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.zoom_out_map),
+            onPressed: _resetZoom,
+            tooltip: 'Reset zoom',
+          ),
+        ],
+      ),
+      body: Center(
+        child: SizedBox(
+          width: screenSize.width,
+          height: screenSize.height - kToolbarHeight - MediaQuery.of(context).padding.top,
+          child: _interactiveViewer,
+        ),
       ),
     );
   }
