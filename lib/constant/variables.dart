@@ -7,7 +7,7 @@ class Variables {
   static String get appVersion => dotenv.env['APP_VERSION'] ?? '2.0.2+10014';
 
   // API URLs
-  static String get baseUrl => dotenv.env['BASE_URL'] ?? 'https://arrahnuauction.stg.muamalat.com.my';
+  static String get baseUrl => dotenv.env['BASE_URL'] ?? 'https://arrahnuauction.muamalat.com.my';
   static String get mainUrl => dotenv.env['MAIN_URL'] ?? 'https://muamalat.com.my';
   static String get url => dotenv.env['URL_PATH'] ?? 'financing/personal/ar-rahnu/ar-rahnu-islamic-pawn-broking-tawarruq';
 
