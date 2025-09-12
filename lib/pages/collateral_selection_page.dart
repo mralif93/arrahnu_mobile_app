@@ -340,34 +340,50 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
                                   size: 20 * scaleFactor,
                                 ),
                                 SizedBox(width: 8 * scaleFactor),
-                                Text(
-                                  'Place Bid for All Items in Account',
-                                  style: TextStyle(
-                                    fontSize: 14 * scaleFactor,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.grey[800],
-                                  ),
-                                ),
+                            Text(
+                              'Place Bid for All Items in Account',
+                              style: TextStyle(
+                                fontSize: 12 * scaleFactor,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[800],
+                              ),
+                            ),
                               ],
                             ),
                             SizedBox(height: 8 * scaleFactor),
                             Text(
                               'This will place the same bid amount for all $totalItems items in this account.',
                               style: TextStyle(
-                                fontSize: 12 * scaleFactor,
+                                fontSize: 10 * scaleFactor,
                                 color: Colors.grey[600],
                               ),
                             ),
-                            SizedBox(height: 16 * scaleFactor),
+                            SizedBox(height: 12 * scaleFactor),
                             TextFormField(
                               controller: _bidController,
                               keyboardType: TextInputType.number,
+                              style: TextStyle(
+                                fontSize: 12 * scaleFactor,
+                              ),
                               decoration: InputDecoration(
                                 labelText: 'Bid Amount (RM)',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8 * scaleFactor),
+                                labelStyle: TextStyle(
+                                  fontSize: 11 * scaleFactor,
                                 ),
-                                prefixIcon: Icon(Icons.attach_money),
+                                hintStyle: TextStyle(
+                                  fontSize: 11 * scaleFactor,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6 * scaleFactor),
+                                ),
+                                prefixIcon: Icon(
+                                  Icons.attach_money,
+                                  size: 16 * scaleFactor,
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12 * scaleFactor,
+                                  vertical: 8 * scaleFactor,
+                                ),
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
@@ -380,7 +396,7 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
                                 return null;
                               },
                             ),
-                            SizedBox(height: 16 * scaleFactor),
+                            SizedBox(height: 12 * scaleFactor),
                             Row(
                               children: [
                                 Expanded(
@@ -389,21 +405,27 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.orange,
                                       foregroundColor: Colors.white,
-                                      padding: EdgeInsets.symmetric(vertical: 12 * scaleFactor),
+                                      padding: EdgeInsets.symmetric(vertical: 8 * scaleFactor),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8 * scaleFactor),
+                                        borderRadius: BorderRadius.circular(6 * scaleFactor),
                                       ),
                                     ),
                                     child: _isSubmitting
                                         ? SizedBox(
-                                            height: 20 * scaleFactor,
-                                            width: 20 * scaleFactor,
+                                            height: 16 * scaleFactor,
+                                            width: 16 * scaleFactor,
                                             child: CircularProgressIndicator(
                                               strokeWidth: 2,
                                               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                             ),
                                           )
-                                        : Text('Submit Bid'),
+                                        : Text(
+                                            'Submit Bid',
+                                            style: TextStyle(
+                                              fontSize: 11 * scaleFactor,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
                                   ),
                                 ),
                                 SizedBox(width: 12 * scaleFactor),
@@ -413,12 +435,18 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
                                       _bidController.clear();
                                     },
                                     style: OutlinedButton.styleFrom(
-                                      padding: EdgeInsets.symmetric(vertical: 12 * scaleFactor),
+                                      padding: EdgeInsets.symmetric(vertical: 8 * scaleFactor),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8 * scaleFactor),
+                                        borderRadius: BorderRadius.circular(6 * scaleFactor),
                                       ),
                                     ),
-                                    child: Text('Cancel'),
+                                    child: Text(
+                                      'Cancel',
+                                      style: TextStyle(
+                                        fontSize: 11 * scaleFactor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
