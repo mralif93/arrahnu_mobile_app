@@ -114,6 +114,82 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  void _showLogoutDialog() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Sign Out'),
+        content: const Text('Are you sure you want to sign out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Get.back();
+              await _performLogout();
+            },
+            child: const Text('Sign Out'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _performLogout() async {
+    try {
+      // Show loading indicator
+      Get.dialog(
+        const Center(
+          child: CircularProgressIndicator(),
+        ),
+        barrierDismissible: false,
+      );
+
+      final response = await AuthController().logout();
+
+      // Close loading dialog
+      Get.back();
+
+      if (response.isSuccess && response.data == true) {
+        // Show success message
+        Get.snackbar(
+          'Success',
+          'You have been signed out successfully',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
+        
+        // Navigate to login page
+        Get.offAll(const NavigationPage());
+      } else {
+        // Show error message
+        Get.snackbar(
+          'Error',
+          'Failed to sign out. Please try again.',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 3),
+        );
+      }
+    } catch (e) {
+      // Close loading dialog if still open
+      if (Get.isDialogOpen == true) {
+        Get.back();
+      }
+      
+      // Show error message
+      Get.snackbar(
+        'Error',
+        'An error occurred during sign out: ${e.toString()}',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 3),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -225,6 +301,35 @@ class _ProfilePageState extends State<ProfilePage> {
             QButton(
               text: 'Update',
               onTap: updateProfile,
+            ),
+
+            // space
+            const SizedBox(height: 12),
+
+            // logout button
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(horizontal: 15),
+              child: ElevatedButton(
+                onPressed: _showLogoutDialog,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red[50],
+                  foregroundColor: Colors.red[600],
+                  elevation: 0,
+                  padding: const EdgeInsets.all(10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(color: Colors.red[200]!),
+                  ),
+                ),
+                child: const Text(
+                  'Sign Out',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
           ],
         ),

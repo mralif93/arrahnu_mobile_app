@@ -204,6 +204,16 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: _showLogoutDialog,
+            icon: const Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
+            tooltip: 'Sign Out',
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
