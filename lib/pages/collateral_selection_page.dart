@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../constant/variables.dart';
+import '../theme/app_theme.dart';
 import '../controllers/authorization.dart';
 import 'collateral_details_page.dart';
 import 'biddings.dart';
@@ -179,7 +180,7 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final scaleFactor = MediaQuery.of(context).size.width / 375.0;
+    final scaleFactor = AppTheme.getScaleFactor(context);
     
     // Filter collections for selected branch and account
     final filteredCollaterals = collections.where((item) {
@@ -203,24 +204,20 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
         title: Text(
           'Collateral',
-          style: TextStyle(
-            fontSize: 18 * scaleFactor,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
+          style: AppTheme.getAppBarTitleStyle(scaleFactor),
         ),
-        backgroundColor: const Color(0xFFFE8000),
+        backgroundColor: AppTheme.primaryOrange,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: Colors.white,
-            size: 20 * scaleFactor,
+            color: AppTheme.textWhite,
+            size: AppTheme.responsiveSize(AppTheme.iconXLarge, scaleFactor),
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -236,8 +233,8 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
             },
             icon: Icon(
               Icons.history,
-              color: Colors.white,
-              size: 20 * scaleFactor,
+              color: AppTheme.textWhite,
+              size: AppTheme.responsiveSize(AppTheme.iconXLarge, scaleFactor),
             ),
             tooltip: 'View My Biddings',
           ),
@@ -255,73 +252,49 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
                   children: [
                     // Header Card
                     Container(
-                      margin: EdgeInsets.only(bottom: 16 * scaleFactor),
-                      padding: EdgeInsets.all(16 * scaleFactor),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12 * scaleFactor),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
+                      margin: EdgeInsets.only(bottom: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
+                      padding: AppTheme.getCardPadding(scaleFactor),
+                      decoration: AppTheme.getCardDecoration(scaleFactor),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
                               Container(
-                                padding: EdgeInsets.all(8 * scaleFactor),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue.withOpacity(0.1),
-                                  shape: BoxShape.circle,
-                                ),
+                                padding: AppTheme.getIconCirclePadding(scaleFactor),
+                                decoration: AppTheme.getIconCircleDecoration(AppTheme.secondaryBlue, scaleFactor),
                                 child: Icon(
                                   Icons.location_on,
-                                  color: Colors.blue,
-                                  size: 16 * scaleFactor,
+                                  color: AppTheme.secondaryBlue,
+                                  size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
                                 ),
                               ),
-                              SizedBox(width: 12 * scaleFactor),
+                              SizedBox(width: AppTheme.spacingMedium),
                               Expanded(
                                 child: Text(
                                   widget.selectedBranch,
-                                  style: TextStyle(
-                                    fontSize: 12 * scaleFactor,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey[700],
-                                  ),
+                                  style: AppTheme.getBodyStyle(scaleFactor),
                                 ),
                               ),
                             ],
                           ),
-                          SizedBox(height: 8 * scaleFactor),
+                          SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                           Row(
                             children: [
                               Container(
-                                padding: EdgeInsets.all(8 * scaleFactor),
-                                decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(0.1),
-                                  shape: BoxShape.circle,
-                                ),
+                                padding: AppTheme.getIconCirclePadding(scaleFactor),
+                                decoration: AppTheme.getIconCircleDecoration(AppTheme.secondaryGreen, scaleFactor),
                                 child: Icon(
                                   Icons.account_balance,
-                                  color: Colors.green,
-                                  size: 16 * scaleFactor,
+                                  color: AppTheme.secondaryGreen,
+                                  size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
                                 ),
                               ),
-                              SizedBox(width: 12 * scaleFactor),
+                              SizedBox(width: AppTheme.spacingMedium),
                               Expanded(
                                 child: Text(
                                   widget.selectedAccount,
-                                  style: TextStyle(
-                                    fontSize: 12 * scaleFactor,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey[700],
-                                  ),
+                                  style: AppTheme.getBodyStyle(scaleFactor),
                                 ),
                               ),
                             ],

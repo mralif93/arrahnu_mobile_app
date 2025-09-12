@@ -7,6 +7,7 @@ import '../components/QAvatar.dart';
 import '../components/QButton.dart';
 import '../components/QListTiles.dart';
 import '../constant/variables.dart';
+import '../theme/app_theme.dart';
 import '../controllers/authorization.dart';
 import '../model/user.dart';
 import 'biddings.dart';
@@ -185,31 +186,26 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Calculate responsive font sizes
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double scaleFactor = (screenWidth / 375).clamp(0.4, 0.7);
+    final scaleFactor = AppTheme.getScaleFactor(context);
     
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFE8000),
-        foregroundColor: Colors.white,
+        backgroundColor: AppTheme.primaryOrange,
+        foregroundColor: AppTheme.textWhite,
         elevation: 0,
         title: Text(
           'Bidding Dashboard',
-          style: TextStyle(
-            fontSize: (20 * scaleFactor).toDouble(),
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+          style: AppTheme.getAppBarTitleStyle(scaleFactor),
         ),
         centerTitle: true,
         actions: [
           IconButton(
             onPressed: _showLogoutDialog,
-            icon: const Icon(
+            icon: Icon(
               Icons.logout,
-              color: Colors.white,
+              color: AppTheme.textWhite,
+              size: AppTheme.responsiveSize(AppTheme.iconXXLarge, scaleFactor),
             ),
             tooltip: 'Sign Out',
           ),
@@ -229,21 +225,21 @@ class _DashboardPageState extends State<DashboardPage> {
               // Welcome Header
               Container(
                 width: double.infinity,
-                margin: const EdgeInsets.all(16),
-                padding: const EdgeInsets.all(24),
+                margin: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
+                padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFFFE8000),
-                      const Color(0xFFE67300),
+                      AppTheme.primaryOrange,
+                      AppTheme.primaryOrangeDark,
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusXLarge, scaleFactor)),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFFE8000).withOpacity(0.3),
+                      color: AppTheme.primaryOrange.withOpacity(0.3),
                       spreadRadius: 2,
                       blurRadius: 12,
                       offset: const Offset(0, 4),
@@ -255,36 +251,34 @@ class _DashboardPageState extends State<DashboardPage> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
+                            color: AppTheme.textWhite.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusSmall, scaleFactor)),
                           ),
                           child: Icon(
                             Icons.person,
-                            size: (32 * scaleFactor).toDouble(),
-                            color: Colors.white,
+                            size: AppTheme.responsiveSize(AppTheme.iconXLarge, scaleFactor),
+                            color: AppTheme.textWhite,
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'Welcome back!',
-                                style: TextStyle(
-                                  fontSize: (16 * scaleFactor).toDouble(),
-                                  color: Colors.white.withOpacity(0.9),
+                                style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
+                                  color: AppTheme.textWhite.withOpacity(0.9),
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
                               Text(
                                 profile.fullName.isNotEmpty ? profile.fullName : 'Bidding User',
-                                style: TextStyle(
-                                  fontSize: (20 * scaleFactor).toDouble(),
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                                  color: AppTheme.textWhite,
+                                  fontWeight: AppTheme.fontWeightBold,
                                 ),
                               ),
                             ],
@@ -298,7 +292,7 @@ class _DashboardPageState extends State<DashboardPage> {
               
               // Bidding Statistics
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
                 child: Row(
                   children: [
                     Expanded(
@@ -306,27 +300,27 @@ class _DashboardPageState extends State<DashboardPage> {
                         'Active Bids',
                         '12',
                         Icons.gavel,
-                        const Color(0xFF3B82F6),
+                        AppTheme.secondaryBlue,
                         scaleFactor,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                     Expanded(
                       child: _buildStatCard(
                         'Won Auctions',
                         '8',
                         Icons.emoji_events,
-                        const Color(0xFF10B981),
+                        AppTheme.secondaryGreen,
                         scaleFactor,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                     Expanded(
                       child: _buildStatCard(
                         'Total Spent',
                         'RM 45K',
                         Icons.attach_money,
-                        const Color(0xFF8B5CF6),
+                        AppTheme.secondaryPurple,
                         scaleFactor,
                       ),
                     ),
@@ -334,23 +328,35 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
               ),
               
-              const SizedBox(height: 24),
+              SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
               
               // Quick Actions
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Quick Actions',
-                      style: TextStyle(
-                        fontSize: (18 * scaleFactor).toDouble(),
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[900],
-                      ),
+                    Row(
+                      children: [
+                        Container(
+                          padding: AppTheme.getIconCirclePadding(scaleFactor),
+                          decoration: AppTheme.getIconCircleDecoration(AppTheme.primaryOrange, scaleFactor),
+                          child: Icon(
+                            Icons.flash_on,
+                            color: AppTheme.primaryOrange,
+                            size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
+                          ),
+                        ),
+                        SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
+                        Text(
+                          'Quick Actions',
+                          style: AppTheme.getHeaderStyle(scaleFactor).copyWith(
+                            color: AppTheme.textPrimary,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                     Row(
                       children: [
                         Expanded(
@@ -363,7 +369,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             scaleFactor,
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                         Expanded(
                           child: _buildActionCard(
                             'My Bidding History',
@@ -376,7 +382,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                     Row(
                       children: [
                         Expanded(
@@ -410,17 +416,29 @@ class _DashboardPageState extends State<DashboardPage> {
               
               // Recent Activity
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Recent Activity',
-                      style: TextStyle(
-                        fontSize: (18 * scaleFactor).toDouble(),
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[900],
-                      ),
+                    Row(
+                      children: [
+                        Container(
+                          padding: AppTheme.getIconCirclePadding(scaleFactor),
+                          decoration: AppTheme.getIconCircleDecoration(AppTheme.secondaryBlue, scaleFactor),
+                          child: Icon(
+                            Icons.history,
+                            color: AppTheme.secondaryBlue,
+                            size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
+                          ),
+                        ),
+                        SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
+                        Text(
+                          'Recent Activity',
+                          style: AppTheme.getHeaderStyle(scaleFactor).copyWith(
+                            color: AppTheme.textPrimary,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     _buildActivityItem(
@@ -460,48 +478,32 @@ class _DashboardPageState extends State<DashboardPage> {
   // Helper method to build stat cards
   Widget _buildStatCard(String title, String value, IconData icon, Color color, double scaleFactor) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
+      decoration: AppTheme.getCardDecoration(scaleFactor),
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
+            padding: AppTheme.getIconCirclePadding(scaleFactor),
+            decoration: AppTheme.getIconCircleDecoration(color, scaleFactor),
             child: Icon(
               icon,
               color: color,
-              size: (20 * scaleFactor).toDouble(),
+              size: AppTheme.responsiveSize(AppTheme.iconSmall, scaleFactor),
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
           Text(
             value,
-            style: TextStyle(
-              fontSize: (18 * scaleFactor).toDouble(),
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+            style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: AppTheme.fontWeightBold,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
           Text(
             title,
-            style: TextStyle(
-              fontSize: (12 * scaleFactor).toDouble(),
-              color: Colors.grey[600],
+            style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
+              color: AppTheme.textMuted,
             ),
             textAlign: TextAlign.center,
           ),
@@ -515,49 +517,33 @@ class _DashboardPageState extends State<DashboardPage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
+        padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
+        decoration: AppTheme.getCardDecoration(scaleFactor),
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
+              padding: AppTheme.getIconCirclePadding(scaleFactor),
+              decoration: AppTheme.getIconCircleDecoration(color, scaleFactor),
               child: Icon(
                 icon,
                 color: color,
-                size: (24 * scaleFactor).toDouble(),
+                size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
             Text(
               title,
-              style: TextStyle(
-                fontSize: (14 * scaleFactor).toDouble(),
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
+              style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                fontWeight: AppTheme.fontWeightBold,
+                color: AppTheme.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
             Text(
               subtitle,
-              style: TextStyle(
-                fontSize: (11 * scaleFactor).toDouble(),
-                color: Colors.grey[600],
+              style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
+                color: AppTheme.textMuted,
               ),
               textAlign: TextAlign.center,
             ),
@@ -570,53 +556,37 @@ class _DashboardPageState extends State<DashboardPage> {
   // Helper method to build activity items
   Widget _buildActivityItem(String title, String time, IconData icon, Color color, double scaleFactor) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      margin: EdgeInsets.only(bottom: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
+      padding: AppTheme.getCardPadding(scaleFactor),
+      decoration: AppTheme.getCardDecoration(scaleFactor),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
+            padding: AppTheme.getIconCirclePadding(scaleFactor),
+            decoration: AppTheme.getIconCircleDecoration(color, scaleFactor),
             child: Icon(
               icon,
               color: color,
-              size: (20 * scaleFactor).toDouble(),
+              size: AppTheme.responsiveSize(AppTheme.iconXLarge, scaleFactor),
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: (14 * scaleFactor).toDouble(),
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[800],
+                  style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                    fontWeight: AppTheme.fontWeightSemiBold,
+                    color: AppTheme.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
                 Text(
                   time,
-                  style: TextStyle(
-                    fontSize: (12 * scaleFactor).toDouble(),
-                    color: Colors.grey[600],
+                  style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
+                    color: AppTheme.textMuted,
                   ),
                 ),
               ],

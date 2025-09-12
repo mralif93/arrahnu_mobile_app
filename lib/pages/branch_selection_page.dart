@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../constant/variables.dart';
+import '../theme/app_theme.dart';
 import 'account_selection_page.dart';
 import 'biddings.dart';
 
@@ -82,28 +83,23 @@ class _BranchSelectionPageState extends State<BranchSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double scaleFactor = (screenWidth / 375).clamp(0.8, 1.2);
+    final scaleFactor = AppTheme.getScaleFactor(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
         title: Text(
           'Branch',
-          style: TextStyle(
-            fontSize: 18 * scaleFactor,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
+          style: AppTheme.getAppBarTitleStyle(scaleFactor),
         ),
-        backgroundColor: const Color(0xFFFE8000),
+        backgroundColor: AppTheme.primaryOrange,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: Colors.white,
-            size: 24 * scaleFactor,
+            color: AppTheme.textWhite,
+            size: AppTheme.responsiveSize(AppTheme.iconXXLarge, scaleFactor),
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -119,8 +115,8 @@ class _BranchSelectionPageState extends State<BranchSelectionPage> {
             },
             icon: Icon(
               Icons.history,
-              color: Colors.white,
-              size: 24 * scaleFactor,
+              color: AppTheme.textWhite,
+              size: AppTheme.responsiveSize(AppTheme.iconXXLarge, scaleFactor),
             ),
             tooltip: 'View My Biddings',
           ),
@@ -182,56 +178,41 @@ class _BranchSelectionPageState extends State<BranchSelectionPage> {
                     children: [
                       // Clean Header
                       Container(
-                        padding: EdgeInsets.all(16 * scaleFactor),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12 * scaleFactor),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.1),
-                              spreadRadius: 1,
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
+                        padding: AppTheme.getCardPadding(scaleFactor),
+                        decoration: AppTheme.getCardDecoration(scaleFactor),
                         child: Row(
                           children: [
                             Container(
-                              padding: EdgeInsets.all(6 * scaleFactor),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFE8000).withOpacity(0.1),
-                                shape: BoxShape.circle,
-                              ),
+                              padding: AppTheme.getIconCirclePadding(scaleFactor),
+                              decoration: AppTheme.getIconCircleDecoration(AppTheme.primaryOrange, scaleFactor),
                               child: Icon(
                                 Icons.business,
-                                size: 14 * scaleFactor,
-                                color: const Color(0xFFFE8000),
+                                size: AppTheme.responsiveSize(AppTheme.iconSmall, scaleFactor),
+                                color: AppTheme.primaryOrange,
                               ),
                             ),
-                            SizedBox(width: 12 * scaleFactor),
+                            SizedBox(width: AppTheme.spacingMedium),
                             Expanded(
                               child: Text(
                                 'Available Branches',
-                                style: TextStyle(
-                                  fontSize: 12 * scaleFactor,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey[800],
-                                ),
+                                style: AppTheme.getBodyStyle(scaleFactor),
                               ),
                             ),
                             Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8 * scaleFactor, vertical: 4 * scaleFactor),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor),
+                                vertical: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor),
+                              ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFE8000).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8 * scaleFactor),
+                                color: AppTheme.primaryOrange.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusMedium, scaleFactor)),
                               ),
                               child: Text(
                                 '${branchData.length} branches',
                                 style: TextStyle(
-                                  fontSize: 10 * scaleFactor,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFFFE8000),
+                                  fontSize: AppTheme.responsiveSize(AppTheme.fontSizeSmall, scaleFactor),
+                                  fontWeight: AppTheme.fontWeightSemiBold,
+                                  color: AppTheme.primaryOrange,
                                 ),
                               ),
                             ),
@@ -251,7 +232,7 @@ class _BranchSelectionPageState extends State<BranchSelectionPage> {
                             
                             return AnimatedContainer(
                               duration: Duration(milliseconds: 300 + (index * 50)),
-                              margin: EdgeInsets.only(bottom: 12 * scaleFactor),
+                              margin: EdgeInsets.only(bottom: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
                               child: Material(
                                 color: Colors.transparent,
                                 child: InkWell(
@@ -263,58 +244,43 @@ class _BranchSelectionPageState extends State<BranchSelectionPage> {
                                       ),
                                     );
                                   },
-                                  borderRadius: BorderRadius.circular(16 * scaleFactor),
+                                  borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusXLarge, scaleFactor)),
                                   child: Container(
-                                    padding: EdgeInsets.all(12 * scaleFactor),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(12 * scaleFactor),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.1),
-                                          spreadRadius: 1,
-                                          blurRadius: 6,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
+                                    padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
+                                    decoration: AppTheme.getCardDecoration(scaleFactor),
                                     child: Row(
                                       children: [
                                         Container(
-                                          padding: EdgeInsets.all(6 * scaleFactor),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFFE8000).withOpacity(0.1),
-                                            shape: BoxShape.circle,
-                                          ),
+                                          padding: AppTheme.getIconCirclePadding(scaleFactor),
+                                          decoration: AppTheme.getIconCircleDecoration(AppTheme.primaryOrange, scaleFactor),
                                           child: Icon(
                                             Icons.business,
-                                            color: const Color(0xFFFE8000),
-                                            size: 18 * scaleFactor,
+                                            color: AppTheme.primaryOrange,
+                                            size: AppTheme.responsiveSize(AppTheme.iconLarge, scaleFactor),
                                           ),
                                         ),
-                                        SizedBox(width: 12 * scaleFactor),
+                                        SizedBox(width: AppTheme.spacingMedium),
                                         Expanded(
                                           child: Text(
                                             branchTitle,
-                                            style: TextStyle(
-                                              fontSize: 12 * scaleFactor,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.grey[800],
-                                            ),
+                                            style: AppTheme.getBodyStyle(scaleFactor),
                                           ),
                                         ),
                                         Container(
-                                          padding: EdgeInsets.symmetric(horizontal: 8 * scaleFactor, vertical: 4 * scaleFactor),
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor),
+                                            vertical: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor),
+                                          ),
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFFFE8000).withOpacity(0.1),
-                                            borderRadius: BorderRadius.circular(8 * scaleFactor),
+                                            color: AppTheme.primaryOrange.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusMedium, scaleFactor)),
                                           ),
                                           child: Text(
                                             '$accountCount',
                                             style: TextStyle(
-                                              fontSize: 10 * scaleFactor,
-                                              fontWeight: FontWeight.bold,
-                                              color: const Color(0xFFFE8000),
+                                              fontSize: AppTheme.responsiveSize(AppTheme.fontSizeSmall, scaleFactor),
+                                              fontWeight: AppTheme.fontWeightBold,
+                                              color: AppTheme.primaryOrange,
                                             ),
                                           ),
                                         ),

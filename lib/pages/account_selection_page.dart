@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'collateral_selection_page.dart';
 import 'biddings.dart';
 import '../constant/variables.dart';
+import '../theme/app_theme.dart';
 
 class AccountSelectionPage extends StatefulWidget {
   final String selectedBranch;
@@ -94,31 +95,26 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double scaleFactor = (screenWidth / 375).clamp(0.8, 1.2);
+    final scaleFactor = AppTheme.getScaleFactor(context);
 
     final accounts = widget.branchData[widget.selectedBranch]?.toList() ?? [];
     accounts.sort((a, b) => a.compareTo(b));
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
         title: Text(
           'Account',
-          style: TextStyle(
-            fontSize: 18 * scaleFactor,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
+          style: AppTheme.getAppBarTitleStyle(scaleFactor),
         ),
-        backgroundColor: const Color(0xFFFE8000),
+        backgroundColor: AppTheme.primaryOrange,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: Colors.white,
-            size: 24 * scaleFactor,
+            color: AppTheme.textWhite,
+            size: AppTheme.responsiveSize(AppTheme.iconXXLarge, scaleFactor),
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -134,8 +130,8 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
             },
             icon: Icon(
               Icons.history,
-              color: Colors.white,
-              size: 24 * scaleFactor,
+              color: AppTheme.textWhite,
+              size: AppTheme.responsiveSize(AppTheme.iconXXLarge, scaleFactor),
             ),
             tooltip: 'View My Biddings',
           ),
@@ -147,15 +143,12 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircularProgressIndicator(
-                    color: const Color(0xFFFE8000),
+                    color: AppTheme.primaryOrange,
                   ),
-                  SizedBox(height: 16 * scaleFactor),
+                  SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
                   Text(
                     'Loading accounts...',
-                    style: TextStyle(
-                      fontSize: 16 * scaleFactor,
-                      color: Colors.grey[600],
-                    ),
+                    style: AppTheme.getBodyStyle(scaleFactor),
                   ),
                 ],
               ),
@@ -167,86 +160,64 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
                     children: [
                       Icon(
                         Icons.account_balance_wallet_outlined,
-                        size: 64 * scaleFactor,
-                        color: Colors.grey[400],
+                        size: AppTheme.responsiveSize(AppTheme.iconXXXLarge, scaleFactor),
+                        color: AppTheme.textMuted,
                       ),
-                      SizedBox(height: 16 * scaleFactor),
+                      SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
                       Text(
                         'No accounts available',
-                        style: TextStyle(
-                          fontSize: 16 * scaleFactor,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[600],
-                        ),
+                        style: AppTheme.getHeaderStyle(scaleFactor),
                       ),
-                      SizedBox(height: 8 * scaleFactor),
+                      SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                       Text(
                         'This branch has no accounts',
-                        style: TextStyle(
-                          fontSize: 12 * scaleFactor,
-                          color: Colors.grey[500],
-                        ),
+                        style: AppTheme.getCaptionStyle(scaleFactor),
                       ),
                     ],
                   ),
                 )
           : Padding(
-              padding: EdgeInsets.all(16 * scaleFactor),
+              padding: AppTheme.getCardPadding(scaleFactor),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Clean Header
                   Container(
-                    padding: EdgeInsets.all(16 * scaleFactor),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12 * scaleFactor),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          spreadRadius: 1,
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
+                    padding: AppTheme.getCardPadding(scaleFactor),
+                    decoration: AppTheme.getCardDecoration(scaleFactor),
                     child: Row(
                       children: [
                         Container(
-                          padding: EdgeInsets.all(6 * scaleFactor),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFE8000).withOpacity(0.1),
-                            shape: BoxShape.circle,
-                          ),
+                          padding: AppTheme.getIconCirclePadding(scaleFactor),
+                          decoration: AppTheme.getIconCircleDecoration(AppTheme.primaryOrange, scaleFactor),
                           child: Icon(
                             Icons.location_on,
-                            size: 14 * scaleFactor,
-                            color: const Color(0xFFFE8000),
+                            size: AppTheme.responsiveSize(AppTheme.iconLarge, scaleFactor),
+                            color: AppTheme.primaryOrange,
                           ),
                         ),
-                        SizedBox(width: 12 * scaleFactor),
+                        SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
                         Expanded(
                           child: Text(
                             widget.selectedBranch,
-                            style: TextStyle(
-                              fontSize: 12 * scaleFactor,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[800],
-                            ),
+                            style: AppTheme.getBodyStyle(scaleFactor),
                           ),
                         ),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8 * scaleFactor, vertical: 4 * scaleFactor),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor), 
+                            vertical: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor),
+                          ),
                           decoration: BoxDecoration(
-                            color: Colors.blue[600]!.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8 * scaleFactor),
+                            color: AppTheme.primaryOrange.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusSmall, scaleFactor)),
                           ),
                           child: Text(
                             '${accounts.length} accounts',
                             style: TextStyle(
-                              fontSize: 10 * scaleFactor,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.blue[600],
+                              fontSize: AppTheme.responsiveSize(AppTheme.fontSizeSmall, scaleFactor),
+                              fontWeight: AppTheme.fontWeightSemiBold,
+                              color: AppTheme.primaryOrange,
                             ),
                           ),
                         ),
@@ -254,7 +225,7 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
                     ),
                   ),
                   
-                  SizedBox(height: 20 * scaleFactor),
+                  SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXLarge, scaleFactor)),
                   
                   // Accounts List
                   Expanded(
@@ -265,7 +236,7 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
                         
                         return AnimatedContainer(
                           duration: Duration(milliseconds: 300 + (index * 50)),
-                          margin: EdgeInsets.only(bottom: 12 * scaleFactor),
+                          margin: EdgeInsets.only(bottom: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
                           child: Column(
                             children: [
                               // Account Card
@@ -280,48 +251,34 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
                                       ),
                                     );
                                   },
-                                  borderRadius: BorderRadius.circular(16 * scaleFactor),
+                                  borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusXLarge, scaleFactor)),
                                   child: Container(
-                                    padding: EdgeInsets.all(12 * scaleFactor),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(12 * scaleFactor),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.1),
-                                          spreadRadius: 1,
-                                          blurRadius: 6,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
+                                    padding: AppTheme.getCardPadding(scaleFactor),
+                                    decoration: AppTheme.getCardDecoration(scaleFactor),
                                     child: Row(
                                       children: [
                                         // Account Image or Icon
                                         Container(
-                                          width: 40 * scaleFactor,
-                                          height: 40 * scaleFactor,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(8 * scaleFactor),
-                                            border: Border.all(color: Colors.grey[300]!),
-                                          ),
+                                          width: AppTheme.responsiveSize(AppTheme.iconXXLarge, scaleFactor),
+                                          height: AppTheme.responsiveSize(AppTheme.iconXXLarge, scaleFactor),
+                                          decoration: AppTheme.getIconCircleDecoration(AppTheme.primaryOrange, scaleFactor),
                                           child: accountImages[accountNumber] != null
                                               ? ClipRRect(
-                                                  borderRadius: BorderRadius.circular(8 * scaleFactor),
+                                                  borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusCircular, scaleFactor)),
                                                   child: Image.network(
                                                     '${Variables.baseUrl}${accountImages[accountNumber]}',
                                                     fit: BoxFit.cover,
                                                     loadingBuilder: (context, child, loadingProgress) {
                                                       if (loadingProgress == null) return child;
                                                       return Container(
-                                                        color: Colors.grey[200],
+                                                        decoration: AppTheme.getIconCircleDecoration(AppTheme.textMuted.withOpacity(0.2), scaleFactor),
                                                         child: Center(
                                                           child: SizedBox(
-                                                            width: 16 * scaleFactor,
-                                                            height: 16 * scaleFactor,
+                                                            width: AppTheme.responsiveSize(AppTheme.iconSmall, scaleFactor),
+                                                            height: AppTheme.responsiveSize(AppTheme.iconSmall, scaleFactor),
                                                             child: CircularProgressIndicator(
                                                               strokeWidth: 2,
-                                                              color: const Color(0xFFFE8000),
+                                                              color: AppTheme.primaryOrange,
                                                             ),
                                                           ),
                                                         ),
@@ -329,48 +286,47 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
                                                     },
                                                     errorBuilder: (context, error, stackTrace) {
                                                       return Container(
-                                                        color: Colors.blue[600]!.withOpacity(0.1),
+                                                        decoration: AppTheme.getIconCircleDecoration(AppTheme.primaryOrange, scaleFactor),
                                                         child: Icon(
                                                           Icons.account_balance_wallet,
-                                                          color: Colors.blue[600],
-                                                          size: 18 * scaleFactor,
+                                                          color: AppTheme.primaryOrange,
+                                                          size: AppTheme.responsiveSize(AppTheme.iconSmall, scaleFactor),
                                                         ),
                                                       );
                                                     },
                                                   ),
                                                 )
                                               : Container(
-                                                  color: Colors.blue[600]!.withOpacity(0.1),
+                                                  decoration: AppTheme.getIconCircleDecoration(AppTheme.primaryOrange, scaleFactor),
                                                   child: Icon(
                                                     Icons.account_balance_wallet,
-                                                    color: Colors.blue[600],
-                                                    size: 18 * scaleFactor,
+                                                    color: AppTheme.primaryOrange,
+                                                    size: AppTheme.responsiveSize(AppTheme.iconSmall, scaleFactor),
                                                   ),
                                                 ),
                                         ),
-                                        SizedBox(width: 12 * scaleFactor),
+                                        SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
                                         Expanded(
                                           child: Text(
                                             accountNumber,
-                                            style: TextStyle(
-                                              fontSize: 12 * scaleFactor,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.grey[800],
-                                            ),
+                                            style: AppTheme.getBodyStyle(scaleFactor),
                                           ),
                                         ),
                                         Container(
-                                          padding: EdgeInsets.symmetric(horizontal: 8 * scaleFactor, vertical: 4 * scaleFactor),
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor), 
+                                            vertical: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor),
+                                          ),
                                           decoration: BoxDecoration(
-                                            color: Colors.green[600]!.withOpacity(0.1),
-                                            borderRadius: BorderRadius.circular(8 * scaleFactor),
+                                            color: AppTheme.primaryOrange.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusSmall, scaleFactor)),
                                           ),
                                           child: Text(
                                             '${accountCollateralCounts[accountNumber] ?? 0}',
                                             style: TextStyle(
-                                              fontSize: 10 * scaleFactor,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.green[600],
+                                              fontSize: AppTheme.responsiveSize(AppTheme.fontSizeSmall, scaleFactor),
+                                              fontWeight: AppTheme.fontWeightSemiBold,
+                                              color: AppTheme.primaryOrange,
                                             ),
                                           ),
                                         ),

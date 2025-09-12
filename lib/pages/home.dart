@@ -11,6 +11,7 @@ import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 import '../constant/variables.dart';
+import '../theme/app_theme.dart';
 import '../controllers/authorization.dart';
 
 class HomePage extends StatefulWidget {
@@ -47,9 +48,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
+    final scaleFactor = AppTheme.getScaleFactor(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppTheme.backgroundLight,
       body: RefreshIndicator(
         onRefresh: () async {
           setState(() {
@@ -65,20 +67,23 @@ class _HomePageState extends State<HomePage> {
               
               // Header section with logo
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor),
+                  vertical: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
+                ),
                 child: Column(
                   children: [
                     Image.asset(
                       "assets/images/muamalat_logo_01.png",
                       width: double.infinity,
-                      height: 120,
+                      height: AppTheme.responsiveSize(80, scaleFactor),
                       fit: BoxFit.contain,
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 8),
+              SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
 
               // Bidding session cards
               FutureBuilder(
@@ -86,58 +91,50 @@ class _HomePageState extends State<HomePage> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Container(
-                      padding: const EdgeInsets.all(40),
+                      padding: EdgeInsets.all(AppTheme.responsiveSize(40, scaleFactor)),
                       child: Column(
                         children: [
                           Container(
-                            width: 60,
-                            height: 60,
+                            width: AppTheme.responsiveSize(60, scaleFactor),
+                            height: AppTheme.responsiveSize(60, scaleFactor),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFE8000).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(30),
+                              color: AppTheme.primaryOrange.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusCircular, scaleFactor)),
                             ),
-                            child: const CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFE8000)),
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryOrange),
                               strokeWidth: 3,
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXLarge, scaleFactor)),
                           Text(
                             'Loading bidding information...',
-                            style: TextStyle(
-                              color: Colors.grey[700],
-                              fontSize: 16,
-                            ),
+                            style: AppTheme.getBodyStyle(scaleFactor),
                           ),
                         ],
                       ),
                     );
                   } else if (snapshot.hasError) {
                     return Container(
-                      padding: const EdgeInsets.all(40),
+                      padding: EdgeInsets.all(AppTheme.responsiveSize(40, scaleFactor)),
                       child: Column(
                         children: [
                           Icon(
                             Icons.error_outline,
-                            size: 40,
-                            color: Colors.red[600],
+                            size: AppTheme.responsiveSize(AppTheme.iconXXXLarge, scaleFactor),
+                            color: AppTheme.secondaryRed,
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXLarge, scaleFactor)),
                           Text(
                             'Unable to Load Data',
-                            style: TextStyle(
-                              color: Colors.red[700],
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
+                            style: AppTheme.getHeaderStyle(scaleFactor).copyWith(
+                              color: AppTheme.secondaryRed,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                           Text(
                             'Please check your connection and try again',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 14,
-                            ),
+                            style: AppTheme.getCaptionStyle(scaleFactor),
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -156,55 +153,40 @@ class _HomePageState extends State<HomePage> {
                         // Start time card
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey[200]!),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                spreadRadius: 1,
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+                          padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
+                          margin: EdgeInsets.symmetric(
+                            horizontal: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor), 
+                            vertical: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor),
                           ),
+                          decoration: AppTheme.getCardDecoration(scaleFactor),
                           child: Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFE8000),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(
+                                padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
+                                decoration: AppTheme.getIconCircleDecoration(AppTheme.primaryOrange, scaleFactor),
+                                child: Icon(
                                   Icons.play_arrow,
-                                  size: 20,
-                                  color: Colors.white,
+                                  size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
+                                  color: AppTheme.primaryOrange,
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       Variables.biddingStartText,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFFFE8000),
+                                      style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                                        color: AppTheme.primaryOrange,
+                                        fontWeight: AppTheme.fontWeightSemiBold,
                                       ),
                                     ),
-                                    const SizedBox(height: 6),
+                                    SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
                                     Text(
                                       '${DateFormat('dd/MM/yyyy hh:mm a').format(startBidding)} (${DateFormat('EEEE').format(startBidding)})',
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFFFE8000),
+                                      style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
+                                        color: AppTheme.primaryOrange,
                                       ),
                                     ),
                                   ],
@@ -217,55 +199,40 @@ class _HomePageState extends State<HomePage> {
                         // End time card
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey[200]!),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                spreadRadius: 1,
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+                          padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
+                          margin: EdgeInsets.symmetric(
+                            horizontal: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor), 
+                            vertical: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor),
                           ),
+                          decoration: AppTheme.getCardDecoration(scaleFactor),
                           child: Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFE8000),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(
+                                padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
+                                decoration: AppTheme.getIconCircleDecoration(AppTheme.primaryOrange, scaleFactor),
+                                child: Icon(
                                   Icons.stop,
-                                  size: 20,
-                                  color: Colors.white,
+                                  size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
+                                  color: AppTheme.primaryOrange,
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       Variables.biddingEndText,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFFFE8000),
+                                      style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                                        color: AppTheme.primaryOrange,
+                                        fontWeight: AppTheme.fontWeightSemiBold,
                                       ),
                                     ),
-                                    const SizedBox(height: 6),
+                                    SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
                                     Text(
                                       '${DateFormat('dd/MM/yyyy hh:mm a').format(endBidding)} (${DateFormat('EEEE').format(endBidding)})',
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFFFE8000),
+                                      style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
+                                        color: AppTheme.primaryOrange,
                                       ),
                                     ),
                                   ],
@@ -278,54 +245,42 @@ class _HomePageState extends State<HomePage> {
                         // Status section
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(20),
-                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey[200]!),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                spreadRadius: 1,
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+                          padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
+                          margin: EdgeInsets.symmetric(
+                            horizontal: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor), 
+                            vertical: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor),
                           ),
+                          decoration: AppTheme.getCardDecoration(scaleFactor),
                           child: Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(12),
+                                padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
                                 decoration: BoxDecoration(
                                   color: _getStatusColor(),
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusSmall, scaleFactor)),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.info_outline,
-                                  size: 24,
+                                  size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
                                   color: Colors.white,
                                 ),
                               ),
-                              const SizedBox(width: 16),
+                              SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       'Bidding Session Status',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.grey,
+                                      style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
+                                        color: AppTheme.textMuted,
                                       ),
                                     ),
-                                    const SizedBox(height: 6),
+                                    SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
                                     Text(
                                       _getStaticStatusText(),
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w700,
+                                      style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                                        fontWeight: AppTheme.fontWeightBold,
                                         color: _getStatusColor(),
                                       ),
                                     ),
@@ -366,7 +321,10 @@ class _HomePageState extends State<HomePage> {
               // Bidding Button
               Container(
                 width: double.infinity,
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                margin: EdgeInsets.symmetric(
+                  horizontal: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor), 
+                  vertical: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
+                ),
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -375,31 +333,27 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFE8000),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: AppTheme.primaryOrange,
+                    foregroundColor: AppTheme.textWhite,
+                    padding: EdgeInsets.symmetric(vertical: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusLarge, scaleFactor)),
                     ),
                     elevation: 4,
-                    shadowColor: const Color(0xFFFE8000).withOpacity(0.3),
+                    shadowColor: AppTheme.primaryOrange.withOpacity(0.3),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
                         Icons.gavel,
-                        size: 20,
-                        color: Colors.white,
+                        size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
+                        color: AppTheme.textWhite,
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                       Text(
                         'Browse Items',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
+                        style: AppTheme.getButtonTextStyle(scaleFactor),
                       ),
                     ],
                   ),

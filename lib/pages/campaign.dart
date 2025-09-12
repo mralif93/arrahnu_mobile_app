@@ -7,6 +7,7 @@ import 'dart:convert';
 
 import '../components/QCard.dart';
 import '../constant/variables.dart';
+import '../theme/app_theme.dart';
 import 'home.dart';
 import 'account.dart';
 import 'dashboard.dart';
@@ -68,8 +69,10 @@ class _CampaignPageState extends State<CampaignPage> {
 
   @override
   Widget build(BuildContext context) {
+    final scaleFactor = AppTheme.getScaleFactor(context);
+    
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppTheme.backgroundLight,
       body: RefreshIndicator(
         onRefresh: () async {
           setState(() {
@@ -103,29 +106,22 @@ class _CampaignPageState extends State<CampaignPage> {
 
               // Quick Actions Title
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: AppTheme.spacingLarge),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFE8000).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
+                      padding: AppTheme.getIconCirclePadding(scaleFactor),
+                      decoration: AppTheme.getIconCircleDecoration(AppTheme.primaryOrange, scaleFactor),
+                      child: Icon(
                         Icons.flash_on,
-                        color: Color(0xFFFE8000),
-                        size: 20,
+                        color: AppTheme.primaryOrange,
+                        size: AppTheme.responsiveSize(AppTheme.iconXLarge, scaleFactor),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: AppTheme.spacingMedium),
                     Text(
                       'Quick Actions',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.grey[900],
-                      ),
+                      style: AppTheme.getSubtitleStyle(scaleFactor),
                     ),
                   ],
                 ),
@@ -135,20 +131,9 @@ class _CampaignPageState extends State<CampaignPage> {
 
               // Quick Actions Cards - Horizontal Scrollable
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.08),
-                      spreadRadius: 1,
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
+                margin: EdgeInsets.symmetric(horizontal: AppTheme.spacingLarge),
+                padding: EdgeInsets.all(AppTheme.spacingXLarge),
+                decoration: AppTheme.getCardDecoration(scaleFactor),
                 child: SizedBox(
                   height: 80,
                   child: ListView(
@@ -204,29 +189,22 @@ class _CampaignPageState extends State<CampaignPage> {
 
               // Our Campaigns Title
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: AppTheme.spacingLarge),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFE8000).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
+                      padding: AppTheme.getIconCirclePadding(scaleFactor),
+                      decoration: AppTheme.getIconCircleDecoration(AppTheme.primaryOrange, scaleFactor),
+                      child: Icon(
                         Icons.campaign,
-                        color: Color(0xFFFE8000),
-                        size: 20,
+                        color: AppTheme.primaryOrange,
+                        size: AppTheme.responsiveSize(AppTheme.iconXLarge, scaleFactor),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: AppTheme.spacingMedium),
                     Text(
                       'Our Campaigns',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.grey[900],
-                      ),
+                      style: AppTheme.getSubtitleStyle(scaleFactor),
                     ),
                   ],
                 ),
@@ -236,20 +214,9 @@ class _CampaignPageState extends State<CampaignPage> {
 
               // Our Campaigns Content
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.08),
-                      spreadRadius: 1,
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
+                margin: EdgeInsets.symmetric(horizontal: AppTheme.spacingLarge),
+                padding: EdgeInsets.all(AppTheme.spacingXLarge),
+                decoration: AppTheme.getCardDecoration(scaleFactor),
                 child: Column(
                   children: [
                     if (items.isEmpty)
@@ -341,14 +308,16 @@ class _CampaignPageState extends State<CampaignPage> {
     required Color color,
     required VoidCallback onTap,
   }) {
+    final scaleFactor = AppTheme.getScaleFactor(context);
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 80,
-        height: 80,
+        width: AppTheme.responsiveSize(80, scaleFactor),
+        height: AppTheme.responsiveSize(80, scaleFactor),
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusLarge, scaleFactor)),
           boxShadow: [
             BoxShadow(
               color: color.withOpacity(0.15),
@@ -362,19 +331,19 @@ class _CampaignPageState extends State<CampaignPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(AppTheme.responsiveSize(12, scaleFactor)),
               child: Icon(
                 icon,
                 color: color,
-                size: 28,
+                size: AppTheme.responsiveSize(AppTheme.iconXXLarge, scaleFactor),
               ),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: AppTheme.spacingTiny),
             Text(
               title,
               style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
+                fontSize: AppTheme.responsiveSize(AppTheme.fontSizeSmall, scaleFactor),
+                fontWeight: AppTheme.fontWeightSemiBold,
                 color: color,
               ),
               textAlign: TextAlign.center,

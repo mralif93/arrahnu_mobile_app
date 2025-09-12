@@ -3,6 +3,7 @@ import 'package:bmmb_pajak_gadai_i/constant/style.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../model/bidding.dart';
+import '../theme/app_theme.dart';
 import '../pages/navigation.dart';
 import '../controllers/authorization.dart';
 
@@ -78,23 +79,17 @@ class _BiddingPageState extends State<BiddingPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Calculate responsive font sizes
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double scaleFactor = (screenWidth / 375).clamp(0.4, 0.7);
+    final scaleFactor = AppTheme.getScaleFactor(context);
     
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFE8000),
-        foregroundColor: Colors.white,
+        backgroundColor: AppTheme.primaryOrange,
+        foregroundColor: AppTheme.textWhite,
         elevation: 0,
         title: Text(
           "My Biddings",
-          style: TextStyle(
-            fontSize: (20 * scaleFactor).toDouble(),
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+          style: AppTheme.getAppBarTitleStyle(scaleFactor),
         ),
         centerTitle: true,
       ),
@@ -120,24 +115,23 @@ class _BiddingPageState extends State<BiddingPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 60,
-            height: 60,
+            width: AppTheme.responsiveSize(50, scaleFactor),
+            height: AppTheme.responsiveSize(50, scaleFactor),
             decoration: BoxDecoration(
-              color: const Color(0xFFFE8000),
-              borderRadius: BorderRadius.circular(30),
+              color: AppTheme.primaryOrange,
+              borderRadius: BorderRadius.circular(AppTheme.responsiveSize(25, scaleFactor)),
             ),
             child: const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               strokeWidth: 3,
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
           Text(
             'Loading your biddings...',
-            style: TextStyle(
-              fontSize: (16 * scaleFactor).toDouble(),
-              color: Colors.grey[700],
-              fontWeight: FontWeight.w500,
+            style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+              color: AppTheme.textMuted,
+              fontWeight: AppTheme.fontWeightMedium,
             ),
           ),
         ],
@@ -149,61 +143,58 @@ class _BiddingPageState extends State<BiddingPage> {
   Widget _buildEmptyState(double scaleFactor) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingXXXLarge, scaleFactor)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 120,
-              height: 120,
+              width: AppTheme.responsiveSize(100, scaleFactor),
+              height: AppTheme.responsiveSize(100, scaleFactor),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(60),
+                color: AppTheme.backgroundLight,
+                borderRadius: BorderRadius.circular(AppTheme.responsiveSize(50, scaleFactor)),
               ),
               child: Icon(
                 Icons.gavel_outlined,
-                size: 60,
-                color: Colors.grey[400],
+                size: AppTheme.responsiveSize(AppTheme.iconXXXLarge, scaleFactor),
+                color: AppTheme.textMuted,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXLarge, scaleFactor)),
             Text(
               'No Biddings Yet',
-              style: TextStyle(
-                fontSize: (20 * scaleFactor).toDouble(),
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
+              style: AppTheme.getTitleStyle(scaleFactor).copyWith(
+                color: AppTheme.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
             Text(
               'You haven\'t placed any bids yet.\nStart bidding to see them here.',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: (14 * scaleFactor).toDouble(),
-                color: Colors.grey[600],
+              style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                color: AppTheme.textMuted,
                 height: 1.5,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXLarge, scaleFactor)),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFE8000),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                backgroundColor: AppTheme.primaryOrange,
+                foregroundColor: AppTheme.textWhite,
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppTheme.responsiveSize(AppTheme.spacingXXXLarge, scaleFactor),
+                  vertical: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor),
+                ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusLarge, scaleFactor)),
                 ),
               ),
               child: Text(
                 'Start Bidding',
-                style: TextStyle(
-                  fontSize: (16 * scaleFactor).toDouble(),
-                  fontWeight: FontWeight.w600,
-                ),
+                style: AppTheme.getButtonTextStyle(scaleFactor),
               ),
             ),
           ],
@@ -221,7 +212,7 @@ class _BiddingPageState extends State<BiddingPage> {
         });
       },
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
         itemCount: biddingsData.length,
         itemBuilder: (context, index) {
           final bid = biddingsData[index];
@@ -238,21 +229,10 @@ class _BiddingPageState extends State<BiddingPage> {
     final isWinning = bidPrice >= reservedPrice;
     
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      margin: EdgeInsets.only(bottom: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
+      decoration: AppTheme.getCardDecoration(scaleFactor),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: AppTheme.getCardPadding(scaleFactor),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -260,40 +240,42 @@ class _BiddingPageState extends State<BiddingPage> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor),
+                    vertical: AppTheme.responsiveSize(2, scaleFactor),
+                  ),
                   decoration: BoxDecoration(
-                    color: isWinning ? Colors.green[100] : Colors.orange[100],
-                    borderRadius: BorderRadius.circular(20),
+                    color: isWinning ? AppTheme.secondaryGreen.withOpacity(0.15) : AppTheme.primaryOrange.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusCircular, scaleFactor)),
                   ),
                   child: Text(
                     isWinning ? 'Winning' : 'Active',
-                    style: TextStyle(
-                      fontSize: (12 * scaleFactor).toDouble(),
-                      fontWeight: FontWeight.w600,
-                      color: isWinning ? Colors.green[700] : Colors.orange[700],
+                    style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
+                      fontWeight: AppTheme.fontWeightBold,
+                      color: isWinning ? AppTheme.secondaryGreen : AppTheme.primaryOrange,
+                      fontSize: AppTheme.responsiveSize(AppTheme.fontSizeTiny, scaleFactor),
                     ),
                   ),
                 ),
                 const Spacer(),
                 Icon(
                   Icons.gavel,
-                  size: (20 * scaleFactor).toDouble(),
-                  color: const Color(0xFFFE8000),
+                  size: AppTheme.responsiveSize(AppTheme.iconLarge, scaleFactor),
+                  color: AppTheme.primaryOrange,
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
             
             // Title
             Text(
               bid['title'] ?? 'Untitled Item',
-              style: TextStyle(
-                fontSize: (18 * scaleFactor).toDouble(),
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
+              style: AppTheme.getHeaderStyle(scaleFactor).copyWith(
+                color: AppTheme.textPrimary,
+                fontSize: AppTheme.responsiveSize(AppTheme.fontSizeLarge, scaleFactor),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
             
             // Price information
             Row(
@@ -303,38 +285,40 @@ class _BiddingPageState extends State<BiddingPage> {
                     'Reserved Price',
                     'RM ${reservedPrice.toStringAsFixed(2)}',
                     Icons.price_check,
-                    Colors.grey[600]!,
+                    AppTheme.textMuted,
                     scaleFactor,
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
                 Expanded(
                   child: _buildPriceInfo(
                     'Your Bid',
                     'RM ${bidPrice.toStringAsFixed(2)}',
                     Icons.attach_money,
-                    const Color(0xFFFE8000),
+                    AppTheme.primaryOrange,
                     scaleFactor,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
             
             // Created date
             Row(
               children: [
                 Icon(
                   Icons.access_time,
-                  size: (16 * scaleFactor).toDouble(),
-                  color: Colors.grey[500],
+                  size: AppTheme.responsiveSize(AppTheme.iconTiny, scaleFactor),
+                  color: AppTheme.textMuted,
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  'Bid placed on ${DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.parse(bid['created_at']).toLocal())}',
-                  style: TextStyle(
-                    fontSize: (12 * scaleFactor).toDouble(),
-                    color: Colors.grey[600],
+                SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
+                Expanded(
+                  child: Text(
+                    'Bid placed on ${DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.parse(bid['created_at']).toLocal())}',
+                    style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
+                      color: AppTheme.textMuted,
+                      fontSize: AppTheme.responsiveSize(AppTheme.fontSizeTiny, scaleFactor),
+                    ),
                   ),
                 ),
               ],
@@ -348,10 +332,10 @@ class _BiddingPageState extends State<BiddingPage> {
   // Price info widget
   Widget _buildPriceInfo(String label, String value, IconData icon, Color color, double scaleFactor) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusMedium, scaleFactor)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,27 +344,29 @@ class _BiddingPageState extends State<BiddingPage> {
             children: [
               Icon(
                 icon,
-                size: (16 * scaleFactor).toDouble(),
+                size: AppTheme.responsiveSize(AppTheme.iconTiny, scaleFactor),
                 color: color,
               ),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: (12 * scaleFactor).toDouble(),
-                  color: color,
-                  fontWeight: FontWeight.w500,
+              SizedBox(width: AppTheme.responsiveSize(2, scaleFactor)),
+              Expanded(
+                child: Text(
+                  label,
+                  style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
+                    color: color,
+                    fontWeight: AppTheme.fontWeightSemiBold,
+                    fontSize: AppTheme.responsiveSize(AppTheme.fontSizeTiny, scaleFactor),
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
           Text(
             value,
-            style: TextStyle(
-              fontSize: (16 * scaleFactor).toDouble(),
-              fontWeight: FontWeight.bold,
+            style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+              fontWeight: AppTheme.fontWeightBold,
               color: color,
+              fontSize: AppTheme.responsiveSize(AppTheme.fontSizeMedium, scaleFactor),
             ),
           ),
         ],

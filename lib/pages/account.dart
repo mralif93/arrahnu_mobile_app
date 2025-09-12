@@ -8,6 +8,7 @@ import '../components/QAvatar.dart';
 import '../components/QButton.dart';
 import '../components/QListTiles.dart';
 import '../constant/variables.dart';
+import '../theme/app_theme.dart';
 import '../controllers/authorization.dart';
 import '../model/user.dart';
 import 'biddings.dart';
@@ -140,9 +141,11 @@ class _AccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
+    final scaleFactor = AppTheme.getScaleFactor(context);
+    
     if (!_isLoggedIn) {
       return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.backgroundWhite,
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
@@ -151,43 +154,34 @@ class _AccountPageState extends State<AccountPage> {
               children: [
                 // Account icon
                 Container(
-                  width: 120,
-                  height: 120,
+                  width: AppTheme.responsiveSize(120, scaleFactor),
+                  height: AppTheme.responsiveSize(120, scaleFactor),
                   decoration: BoxDecoration(
-                    color: Colors.orange[50],
-                    borderRadius: BorderRadius.circular(60),
+                    color: AppTheme.primaryOrange.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusCircular, scaleFactor)),
                   ),
                   child: Center(
                     child: Icon(
                       Icons.account_circle_outlined,
-                      size: 60,
-                      color: Colors.orange[600],
+                      size: AppTheme.responsiveSize(AppTheme.iconXXXLarge, scaleFactor),
+                      color: AppTheme.primaryOrange,
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 48),
+                SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXXXLarge, scaleFactor)),
 
                 // Welcome text
                 Text(
                   'Welcome to Your Account',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w300,
-                    color: Colors.grey[800],
-                    letterSpacing: -0.5,
-                  ),
+                  style: AppTheme.getWelcomeStyle(scaleFactor),
                 ),
 
-                const SizedBox(height: 8),
+                SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
 
                 Text(
                   'Please sign in to access your account features',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w400,
-                  ),
+                  style: AppTheme.getCaptionStyle(scaleFactor),
                   textAlign: TextAlign.center,
                 ),
 
@@ -196,26 +190,22 @@ class _AccountPageState extends State<AccountPage> {
                 // Sign in button
                 SizedBox(
                   width: double.infinity,
-                  height: 56,
+                  height: AppTheme.responsiveSize(56, scaleFactor),
                   child: ElevatedButton(
                     onPressed: () {
                       Get.to(const LoginPage());
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppTheme.primaryOrange,
+                      foregroundColor: AppTheme.textWhite,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusLarge, scaleFactor)),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Sign In',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
-                      ),
+                      style: AppTheme.getButtonTextStyle(scaleFactor),
                     ),
                   ),
                 ),
@@ -228,10 +218,7 @@ class _AccountPageState extends State<AccountPage> {
                   children: [
                     Text(
                       'Don\'t have an account? ',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14,
-                      ),
+                      style: AppTheme.getCaptionStyle(scaleFactor),
                     ),
                     TextButton(
                       onPressed: () async {
@@ -241,14 +228,17 @@ class _AccountPageState extends State<AccountPage> {
                         }
                       },
                       style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 0, 
+                          vertical: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor),
+                        ),
                       ),
                       child: Text(
                         'Sign Up',
                         style: TextStyle(
-                          color: Colors.orange[600],
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
+                          color: AppTheme.primaryOrange,
+                          fontWeight: AppTheme.fontWeightSemiBold,
+                          fontSize: AppTheme.responsiveSize(AppTheme.fontSizeMedium, scaleFactor),
                         ),
                       ),
                     ),
@@ -262,52 +252,43 @@ class _AccountPageState extends State<AccountPage> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.backgroundWhite,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(32.0),
+          padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingXXXLarge, scaleFactor)),
           child: Column(
             children: [
               // Welcome message
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(24),
+                padding: AppTheme.getCardPadding(scaleFactor),
                 decoration: BoxDecoration(
-                  color: Colors.orange[50],
-                  borderRadius: BorderRadius.circular(16),
+                  color: AppTheme.primaryOrange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusXLarge, scaleFactor)),
                 ),
                 child: Column(
                   children: [
                     Icon(
                       Icons.account_circle,
-                      size: 48,
-                      color: Colors.orange[600],
+                      size: AppTheme.responsiveSize(AppTheme.iconXXXLarge, scaleFactor),
+                      color: AppTheme.primaryOrange,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
                     Text(
                       'Welcome back!',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w300,
-                        color: Colors.orange[800],
-                        letterSpacing: -0.5,
-                      ),
+                      style: AppTheme.getTitleStyle(scaleFactor),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                     Text(
                       'Manage your account and bidding activities',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.orange[700],
-                        fontWeight: FontWeight.w400,
-                      ),
+                      style: AppTheme.getCaptionStyle(scaleFactor),
                       textAlign: TextAlign.center,
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 32),
+              SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXXXLarge, scaleFactor)),
 
               // my avatar
               QAvatar(
@@ -316,7 +297,7 @@ class _AccountPageState extends State<AccountPage> {
                 image: Variables.defaultAvatarUrl,
               ),
 
-              const SizedBox(height: 32),
+              SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXXXLarge, scaleFactor)),
 
               // my profile
               QListTiles(
@@ -326,7 +307,7 @@ class _AccountPageState extends State<AccountPage> {
                 },
               ),
 
-              const SizedBox(height: 16),
+              SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
 
               // my bidding
               QListTiles(
@@ -336,7 +317,7 @@ class _AccountPageState extends State<AccountPage> {
                 },
               ),
 
-              const SizedBox(height: 16),
+              SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
 
               if (statusView)
                 QListTiles(
@@ -346,35 +327,31 @@ class _AccountPageState extends State<AccountPage> {
                   },
                 ),
 
-              const SizedBox(height: 48),
+              SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXXXLarge, scaleFactor)),
 
               // button sign out
               SizedBox(
                 width: double.infinity,
-                height: 56,
+                height: AppTheme.responsiveSize(56, scaleFactor),
                 child: ElevatedButton(
                   onPressed: signOutUser,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red[50],
-                    foregroundColor: Colors.red[600],
+                    backgroundColor: AppTheme.secondaryRed.withOpacity(0.1),
+                    foregroundColor: AppTheme.secondaryRed,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.red[200]!),
+                      borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusLarge, scaleFactor)),
+                      side: BorderSide(color: AppTheme.secondaryRed.withOpacity(0.3)),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Sign Out',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                    ),
+                    style: AppTheme.getButtonTextStyle(scaleFactor),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 32),
+              SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXXXLarge, scaleFactor)),
             ],
           ),
         ),

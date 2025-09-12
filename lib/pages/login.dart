@@ -7,6 +7,7 @@ import '../components/QLogo.dart';
 import '../components/QTextField.dart';
 import '../constant/style.dart';
 import '../constant/variables.dart';
+import '../theme/app_theme.dart';
 import '../controllers/authorization.dart';
 import '../pages/campaign.dart';
 
@@ -66,8 +67,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final scaleFactor = AppTheme.getScaleFactor(context);
+    
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.backgroundWhite,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
@@ -96,23 +99,14 @@ class _LoginPageState extends State<LoginPage> {
               // Welcome text
               Text(
                 'Welcome Back',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w300,
-                  color: Colors.grey[800],
-                  letterSpacing: -0.5,
-                ),
+                style: AppTheme.getWelcomeStyle(scaleFactor),
               ),
 
-              const SizedBox(height: 8),
+              SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
 
               Text(
                 'Sign in to continue',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w400,
-                ),
+                style: AppTheme.getCaptionStyle(scaleFactor),
               ),
 
               const SizedBox(height: 48),
