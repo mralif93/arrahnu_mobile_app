@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'collateral_selection_page.dart';
+import 'biddings.dart';
 import '../constant/variables.dart';
 
 class AccountSelectionPage extends StatefulWidget {
@@ -121,6 +122,24 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
           ),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const BiddingPage(),
+                ),
+              );
+            },
+            icon: Icon(
+              Icons.history,
+              color: Colors.white,
+              size: 24 * scaleFactor,
+            ),
+            tooltip: 'View My Biddings',
+          ),
+        ],
       ),
       body: isLoading
           ? Center(

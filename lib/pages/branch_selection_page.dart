@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../constant/variables.dart';
 import 'account_selection_page.dart';
+import 'biddings.dart';
 
 class BranchSelectionPage extends StatefulWidget {
   const BranchSelectionPage({Key? key}) : super(key: key);
@@ -106,6 +107,24 @@ class _BranchSelectionPageState extends State<BranchSelectionPage> {
           ),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const BiddingPage(),
+                ),
+              );
+            },
+            icon: Icon(
+              Icons.history,
+              color: Colors.white,
+              size: 24 * scaleFactor,
+            ),
+            tooltip: 'View My Biddings',
+          ),
+        ],
       ),
       body: isLoading
           ? Center(

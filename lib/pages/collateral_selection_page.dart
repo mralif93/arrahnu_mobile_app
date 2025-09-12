@@ -4,6 +4,7 @@ import 'dart:convert';
 import '../constant/variables.dart';
 import '../controllers/authorization.dart';
 import 'collateral_details_page.dart';
+import 'biddings.dart';
 
 class CollateralSelectionPage extends StatefulWidget {
   final String selectedBranch;
@@ -223,6 +224,24 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
           ),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const BiddingPage(),
+                ),
+              );
+            },
+            icon: Icon(
+              Icons.history,
+              color: Colors.white,
+              size: 20 * scaleFactor,
+            ),
+            tooltip: 'View My Biddings',
+          ),
+        ],
       ),
       body: isLoading
           ? Center(
