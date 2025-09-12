@@ -1,8 +1,8 @@
-import 'package:bmmb_pajak_gadai_i/pages/details.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../constant/variables.dart';
+import 'branch_selection_page.dart';
 
 class BranchPage extends StatefulWidget {
   const BranchPage({super.key});
@@ -62,10 +62,7 @@ class _BranchPageState extends State<BranchPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DetailsPage(
-                            data: collections,  // Make sure this variable is defined and accessible
-                            name: snapshot.data![index],  // Use ! to assert non-null
-                          ),
+                          builder: (context) => const BranchSelectionPage(),
                         ),
                       );
                     },
