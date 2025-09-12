@@ -171,9 +171,6 @@ class _DashboardPageState extends State<DashboardPage> {
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
-              // Add top padding for status bar
-              SizedBox(height: MediaQuery.of(context).padding.top),
-              
               // Welcome Header
               Container(
                 width: double.infinity,

@@ -23,6 +23,7 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
   List<dynamic> collections = [];
   String? accountImageUrl;
   bool isLoading = true;
+  bool isLoggedIn = false;
   
   // Bidding form variables
   final _formKey = GlobalKey<FormState>();
@@ -32,7 +33,23 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
   @override
   void initState() {
     super.initState();
+    _checkAuthenticationStatus();
     _fetchCollections();
+  }
+
+  // Check if user is logged in
+  Future<void> _checkAuthenticationStatus() async {
+    try {
+      final authController = AuthController();
+      final sessionResult = await authController.session();
+      setState(() {
+        isLoggedIn = sessionResult;
+      });
+    } catch (e) {
+      setState(() {
+        isLoggedIn = false;
+      });
+    }
   }
 
   @override
@@ -328,8 +345,8 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
                       ),
                     ),
 
-                    // Bidding Card
-                    Container(
+                    // Bidding Card (only show if user is logged in)
+                    if (isLoggedIn) Container(
                       margin: EdgeInsets.only(bottom: 16 * scaleFactor),
                       padding: EdgeInsets.all(16 * scaleFactor),
                       decoration: BoxDecoration(
@@ -368,7 +385,7 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
                             ),
                             SizedBox(height: 8 * scaleFactor),
                             Text(
-                              'This will place the same bid amount for all $totalItems items in this account.',
+                              'This will place the same bid amount for all $totalItems items in this account. Bid must be greater than the item value.',
                               style: TextStyle(
                                 fontSize: 10 * scaleFactor,
                                 color: Colors.grey[600],
@@ -409,7 +426,42 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
                                 if (amount == null || amount <= 0) {
                                   return 'Please enter valid amount';
                                 }
+                                
+                                // Check if bid amount is greater than the minimum value
+                                double minValue = 0.0;
+                                for (var item in filteredCollaterals) {
+                                  final itemValue = _parseToDouble(item['priceAfterDiscount']) ?? 0.0;
+                                  if (itemValue > minValue) {
+                                    minValue = itemValue;
+                                  }
+                                }
+                                
+                                if (amount <= minValue) {
+                                  return 'Bid must be greater than RM${minValue.toStringAsFixed(0)}';
+                                }
+                                
                                 return null;
+                              },
+                            ),
+                            SizedBox(height: 8 * scaleFactor),
+                            // Show minimum bid amount
+                            Builder(
+                              builder: (context) {
+                                double minValue = 0.0;
+                                for (var item in filteredCollaterals) {
+                                  final itemValue = _parseToDouble(item['priceAfterDiscount']) ?? 0.0;
+                                  if (itemValue > minValue) {
+                                    minValue = itemValue;
+                                  }
+                                }
+                                return Text(
+                                  'Minimum bid: RM${minValue.toStringAsFixed(0)}',
+                                  style: TextStyle(
+                                    fontSize: 9 * scaleFactor,
+                                    color: Colors.orange[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                );
                               },
                             ),
                             SizedBox(height: 12 * scaleFactor),
