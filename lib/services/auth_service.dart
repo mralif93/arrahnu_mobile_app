@@ -49,8 +49,25 @@ class AuthService {
   // Logout
   Future<ApiResponse<bool>> logout() async {
     try {
+      // First, try to call the logout API endpoint if it exists
+      try {
+        await _apiService.post(
+          '${Variables.baseUrl}/api/auth/logout/',
+          requiresAuth: true,
+          showLoading: false,
+        );
+      } catch (e) {
+        // If API logout fails, continue with local logout
+        print('API logout failed, proceeding with local logout: $e');
+      }
+
+      // Clear all stored authentication data
       await SecureStorage().deleteSecureData('token');
       await SecureStorage().deleteSecureData('refresh');
+      
+      // Clear any other user-related data if needed
+      // await SecureStorage().deleteSecureData('user_profile');
+      
       return ApiResponse<bool>.success(data: true);
     } catch (e) {
       return ApiResponse<bool>.error(
