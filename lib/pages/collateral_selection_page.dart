@@ -185,11 +185,27 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
     }
 
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text('Collateral'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        title: Text(
+          'Collateral',
+          style: TextStyle(
+            fontSize: 18 * scaleFactor,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: const Color(0xFFFE8000),
         elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+            size: 20 * scaleFactor,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: isLoading
           ? Center(
