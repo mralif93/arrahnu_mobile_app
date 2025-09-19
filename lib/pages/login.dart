@@ -26,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
     ..onTap = () async {
       Uri registerUrl = Uri.parse("${Variables.baseUrl}${Variables.signupUrl}");
       if (await canLaunchUrl(registerUrl)) {
-        await launchUrl(registerUrl);
+        await launchUrl(registerUrl, mode: LaunchMode.externalApplication);
       } else {
         throw Exception('Could not launch $registerUrl');
       }
@@ -37,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
         ..onTap = () async {
           var resetPassword = Uri.parse('${Variables.baseUrl}${Variables.passwordResetUrl}');
           if (await canLaunchUrl(resetPassword)) {
-            await launchUrl(resetPassword);
+            await launchUrl(resetPassword, mode: LaunchMode.externalApplication);
           } else {
             throw Exception('Could not launch $resetPassword');
           }
@@ -243,9 +243,25 @@ class _LoginPageState extends State<LoginPage> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () async {
-                      Uri resetPassword = Uri.parse('${Variables.baseUrl}${Variables.passwordResetUrl}');
-                      if (await canLaunchUrl(resetPassword)) {
-                        await launchUrl(resetPassword);
+                      try {
+                        Uri resetPassword = Uri.parse('${Variables.baseUrl}${Variables.passwordResetUrl}');
+                        if (await canLaunchUrl(resetPassword)) {
+                          await launchUrl(resetPassword, mode: LaunchMode.externalApplication);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Cannot open forgot password page. Please try again later.'),
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Error opening forgot password page. Please try again later.'),
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
                       }
                     },
                     style: TextButton.styleFrom(
@@ -336,9 +352,25 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     TextButton(
                       onPressed: () async {
-                        Uri registerUrl = Uri.parse("${Variables.baseUrl}${Variables.signupUrl}");
-                        if (await canLaunchUrl(registerUrl)) {
-                          await launchUrl(registerUrl);
+                        try {
+                          Uri registerUrl = Uri.parse("${Variables.baseUrl}${Variables.signupUrl}");
+                          if (await canLaunchUrl(registerUrl)) {
+                            await launchUrl(registerUrl, mode: LaunchMode.externalApplication);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Cannot open sign up page. Please try again later.'),
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Error opening sign up page. Please try again later.'),
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
                         }
                       },
                       style: TextButton.styleFrom(
