@@ -6,6 +6,7 @@ import '../theme/app_theme.dart';
 import '../controllers/authorization.dart';
 import 'collateral_details_page.dart';
 import 'biddings.dart';
+import '../services/session_service.dart';
 
 class CollateralSelectionPage extends StatefulWidget {
   final String selectedBranch;
@@ -26,17 +27,54 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
   String? accountImageUrl;
   bool isLoading = true;
   bool isLoggedIn = false;
+  final SessionService _sessionService = SessionService();
+  bool _isSessionActive = false;
   
   // Bidding form variables
   final _formKey = GlobalKey<FormState>();
   final _bidController = TextEditingController();
   bool _isSubmitting = false;
+  int _currentBidCount = 0;
+  int _maxBidsPerAccount = 3;
 
   @override
   void initState() {
     super.initState();
     _checkAuthenticationStatus();
-    _fetchCollections();
+    _checkSessionAndFetch();
+  }
+
+  Future<void> _checkSessionAndFetch() async {
+    // Check if session is active
+    final isSessionActive = await _sessionService.refreshSessionStatus();
+    setState(() {
+      _isSessionActive = isSessionActive;
+    });
+
+    if (isSessionActive) {
+      await _fetchCollections();
+      await _checkBidCount();
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  // Check current bid count for this account
+  Future<void> _checkBidCount() async {
+    try {
+      final authController = AuthController();
+      final response = await authController.getBidCountForUserAccount(widget.selectedAccount);
+      
+      if (response.isSuccess && response.data != null) {
+        setState(() {
+          _currentBidCount = response.data!;
+        });
+      }
+    } catch (e) {
+      print('Error checking bid count: $e');
+    }
   }
 
   // Check if user is logged in
@@ -63,6 +101,18 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
   // Submit bidding price for all items in the account
   Future<void> _submitBid() async {
     if (!_formKey.currentState!.validate()) return;
+
+    // Check if user has reached the bid limit for this account
+    if (_currentBidCount >= _maxBidsPerAccount) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('You have reached the maximum limit of $_maxBidsPerAccount bids for this account'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 4),
+        ),
+      );
+      return;
+    }
 
     setState(() {
       _isSubmitting = true;
@@ -97,10 +147,16 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
       }
 
       if (allSuccess) {
+        // Update bid count after successful submission
+        setState(() {
+          _currentBidCount++;
+        });
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Bid submitted successfully for all items'),
+            content: Text('Bid submitted successfully! Remaining bids: ${_maxBidsPerAccount - _currentBidCount}'),
             backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
           ),
         );
         _bidController.clear();
@@ -240,11 +296,55 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
           ),
         ],
       ),
-      body: isLoading
+      body: !_isSessionActive
           ? Center(
-              child: CircularProgressIndicator(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.access_time,
+                    size: 80 * scaleFactor,
+                    color: Colors.red[400],
+                  ),
+                  SizedBox(height: 24 * scaleFactor),
+                  Text(
+                    'Session Ended',
+                    style: TextStyle(
+                      fontSize: 24 * scaleFactor,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red[700],
+                    ),
+                  ),
+                  SizedBox(height: 12 * scaleFactor),
+                  Text(
+                    'Browsing is not available.\nThe bidding session has ended.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16 * scaleFactor,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  SizedBox(height: 32 * scaleFactor),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red[600],
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 32 * scaleFactor,
+                        vertical: 12 * scaleFactor,
+                      ),
+                    ),
+                    child: Text('Go Back'),
+                  ),
+                ],
+              ),
             )
-          : SingleChildScrollView(
+          : isLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : SingleChildScrollView(
               child: Padding(
                 padding: EdgeInsets.all(16 * scaleFactor),
                 child: Column(
@@ -456,12 +556,56 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
                                 );
                               },
                             ),
+                            SizedBox(height: 8 * scaleFactor),
+                            // Bid count display
+                            Container(
+                              padding: EdgeInsets.all(8 * scaleFactor),
+                              decoration: BoxDecoration(
+                                color: _currentBidCount >= _maxBidsPerAccount 
+                                    ? Colors.red.withOpacity(0.1)
+                                    : Colors.blue.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(6 * scaleFactor),
+                                border: Border.all(
+                                  color: _currentBidCount >= _maxBidsPerAccount 
+                                      ? Colors.red.withOpacity(0.3)
+                                      : Colors.blue.withOpacity(0.3),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    _currentBidCount >= _maxBidsPerAccount 
+                                        ? Icons.block
+                                        : Icons.info_outline,
+                                    size: 16 * scaleFactor,
+                                    color: _currentBidCount >= _maxBidsPerAccount 
+                                        ? Colors.red[600]
+                                        : Colors.blue[600],
+                                  ),
+                                  SizedBox(width: 8 * scaleFactor),
+                                  Expanded(
+                                    child: Text(
+                                      _currentBidCount >= _maxBidsPerAccount
+                                          ? 'Bid limit reached ($_currentBidCount/$_maxBidsPerAccount)'
+                                          : 'Bids used: $_currentBidCount/$_maxBidsPerAccount (${_maxBidsPerAccount - _currentBidCount} remaining)',
+                                      style: TextStyle(
+                                        fontSize: 10 * scaleFactor,
+                                        color: _currentBidCount >= _maxBidsPerAccount 
+                                            ? Colors.red[600]
+                                            : Colors.blue[600],
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                             SizedBox(height: 12 * scaleFactor),
                             Row(
                               children: [
                                 Expanded(
                                   child: ElevatedButton(
-                                    onPressed: _isSubmitting ? null : _submitBid,
+                                    onPressed: (_isSubmitting || _currentBidCount >= _maxBidsPerAccount) ? null : _submitBid,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.orange,
                                       foregroundColor: Colors.white,

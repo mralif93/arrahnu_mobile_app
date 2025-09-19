@@ -6,6 +6,7 @@ import 'collateral_selection_page.dart';
 import 'biddings.dart';
 import '../constant/variables.dart';
 import '../theme/app_theme.dart';
+import '../services/session_service.dart';
 
 class AccountSelectionPage extends StatefulWidget {
   final String selectedBranch;
@@ -26,11 +27,29 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
   Map<String, String> accountImages = {};
   List<dynamic> allCollateralData = [];
   bool isLoading = true;
+  final SessionService _sessionService = SessionService();
+  bool _isSessionActive = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchCollateralData();
+    _checkSessionAndFetch();
+  }
+
+  Future<void> _checkSessionAndFetch() async {
+    // Check if session is active
+    final isSessionActive = await _sessionService.refreshSessionStatus();
+    setState(() {
+      _isSessionActive = isSessionActive;
+    });
+
+    if (isSessionActive) {
+      _fetchCollateralData();
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -137,23 +156,67 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
           ),
         ],
       ),
-      body: isLoading
+      body: !_isSessionActive
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(
-                    color: AppTheme.primaryOrange,
+                  Icon(
+                    Icons.access_time,
+                    size: 80 * scaleFactor,
+                    color: Colors.red[400],
                   ),
-                  SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
+                  SizedBox(height: 24 * scaleFactor),
                   Text(
-                    'Loading accounts...',
-                    style: AppTheme.getBodyStyle(scaleFactor),
+                    'Session Ended',
+                    style: TextStyle(
+                      fontSize: 24 * scaleFactor,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red[700],
+                    ),
+                  ),
+                  SizedBox(height: 12 * scaleFactor),
+                  Text(
+                    'Browsing is not available.\nThe bidding session has ended.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16 * scaleFactor,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  SizedBox(height: 32 * scaleFactor),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red[600],
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 32 * scaleFactor,
+                        vertical: 12 * scaleFactor,
+                      ),
+                    ),
+                    child: Text('Go Back'),
                   ),
                 ],
               ),
             )
-          : accounts.isEmpty
+          : isLoading
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        color: AppTheme.primaryOrange,
+                      ),
+                      SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
+                      Text(
+                        'Loading accounts...',
+                        style: AppTheme.getBodyStyle(scaleFactor),
+                      ),
+                    ],
+                  ),
+                )
+              : accounts.isEmpty
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

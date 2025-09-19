@@ -13,6 +13,7 @@ import 'package:get/get.dart';
 import '../constant/variables.dart';
 import '../theme/app_theme.dart';
 import '../controllers/authorization.dart';
+import '../services/session_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,6 +30,8 @@ class _HomePageState extends State<HomePage> {
   bool statusView = false;
   String _currentTime = '';
   Map<String, dynamic>? _biddingData;
+  bool _isSessionActive = false;
+  final SessionService _sessionService = SessionService();
 
   final _images = [
     Variables.assetProductFeatures,
@@ -41,7 +44,50 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _currentTime = DateFormat('dd/MM/yyyy hh:mm a').format(DateTime.now());
-    checkBidingTime();
+    _initializeSession();
+  }
+
+  Future<void> _initializeSession() async {
+    await _sessionService.initializeSession();
+    setState(() {
+      _isSessionActive = _sessionService.isSessionActive;
+    });
+    
+    // Listen to session status changes
+    _sessionService.sessionStatusStream.listen((isActive) {
+      if (mounted) {
+        setState(() {
+          _isSessionActive = isActive;
+        });
+      }
+    });
+  }
+
+  void _handleBrowseItemsTap() async {
+    // Double-check session status before navigation
+    final isSessionActive = await _sessionService.refreshSessionStatus();
+    
+    if (isSessionActive) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const BranchSelectionPage()),
+      );
+    } else {
+      // Show error message if session is not active
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Browsing is not available. The bidding session has ended.'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _sessionService.dispose();
+    super.dispose();
   }
 
   @override
@@ -290,6 +336,84 @@ class _HomePageState extends State<HomePage> {
                             ],
                           ),
                         ),
+
+                        // Bidding Button - Only show if session is active and data is loaded
+                        if (_isSessionActive) ...[
+                          Container(
+                            width: double.infinity,
+                            margin: EdgeInsets.symmetric(
+                              horizontal: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor), 
+                              vertical: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
+                            ),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _handleBrowseItemsTap();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.primaryOrange,
+                                foregroundColor: AppTheme.textWhite,
+                                padding: EdgeInsets.symmetric(vertical: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusLarge, scaleFactor)),
+                                ),
+                                elevation: 4,
+                                shadowColor: AppTheme.primaryOrange.withOpacity(0.3),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.gavel,
+                                    size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
+                                    color: AppTheme.textWhite,
+                                  ),
+                                  SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
+                                  Text(
+                                    'Browse Items',
+                                    style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                                      fontWeight: AppTheme.fontWeightSemiBold,
+                                      color: AppTheme.textWhite,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ] else ...[
+                          // Session ended message
+                          Container(
+                            width: double.infinity,
+                            margin: EdgeInsets.symmetric(
+                              horizontal: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor), 
+                              vertical: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
+                            ),
+                            padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusLarge, scaleFactor)),
+                              border: Border.all(color: Colors.red.withOpacity(0.3)),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.info_outline,
+                                  color: Colors.red,
+                                  size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
+                                ),
+                                SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
+                                Expanded(
+                                  child: Text(
+                                    'Browsing is not available. The bidding session has ended.',
+                                    style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                                      color: Colors.red[700],
+                                      fontWeight: AppTheme.fontWeightMedium,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ],
                     );
                   } else {
@@ -316,48 +440,6 @@ class _HomePageState extends State<HomePage> {
                     );
                   }
                 },
-              ),
-              
-              // Bidding Button
-              Container(
-                width: double.infinity,
-                margin: EdgeInsets.symmetric(
-                  horizontal: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor), 
-                  vertical: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
-                ),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const BranchSelectionPage()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryOrange,
-                    foregroundColor: AppTheme.textWhite,
-                    padding: EdgeInsets.symmetric(vertical: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusLarge, scaleFactor)),
-                    ),
-                    elevation: 4,
-                    shadowColor: AppTheme.primaryOrange.withOpacity(0.3),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.gavel,
-                        size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
-                        color: AppTheme.textWhite,
-                      ),
-                      SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
-                      Text(
-                        'Browse Items',
-                        style: AppTheme.getButtonTextStyle(scaleFactor),
-                      ),
-                    ],
-                  ),
-                ),
               ),
               
               // Add bottom padding to extend to device bottom

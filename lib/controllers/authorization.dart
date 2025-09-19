@@ -9,6 +9,7 @@ import '../constant/variables.dart';
 import '../services/auth_service.dart';
 import '../services/bidding_service.dart';
 import '../models/api_response.dart';
+import '../models/api_error.dart';
 
 class AuthController {
   //  Variables
@@ -122,6 +123,48 @@ class AuthController {
   // Get Bidding Info
   Future<ApiResponse<List<dynamic>>> getBiddingInfo() async {
     return await _biddingService.getBiddingInfo();
+  }
+
+  // Check bid count for user-account combination
+  Future<ApiResponse<int>> getBidCountForUserAccount(String accountNumber) async {
+    try {
+      final token = await SecureStorage().readSecureData('token');
+      if (token == 'No data found!!') {
+        return ApiResponse<int>.error(
+          error: ApiError(
+            statusCode: 401,
+            message: 'No authentication token found',
+            type: ApiErrorType.clientError,
+          ),
+        );
+      }
+
+      final decodedToken = JwtDecoder.decode(token);
+      final userId = decodedToken['user_id'];
+
+      if (userId == null) {
+        return ApiResponse<int>.error(
+          error: ApiError(
+            statusCode: 401,
+            message: 'Invalid token format',
+            type: ApiErrorType.clientError,
+          ),
+        );
+      }
+
+      return await _biddingService.getBidCountForUserAccount(
+        userId: userId,
+        accountNumber: accountNumber,
+      );
+    } catch (e) {
+      return ApiResponse<int>.error(
+        error: ApiError(
+          statusCode: 0,
+          message: 'Failed to check bid count: ${e.toString()}',
+          type: ApiErrorType.unknown,
+        ),
+      );
+    }
   }
 
   // Get Gold Prices

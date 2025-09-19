@@ -6,6 +6,7 @@ import '../constant/variables.dart';
 import '../theme/app_theme.dart';
 import 'account_selection_page.dart';
 import 'biddings.dart';
+import '../services/session_service.dart';
 
 class BranchSelectionPage extends StatefulWidget {
   const BranchSelectionPage({Key? key}) : super(key: key);
@@ -18,11 +19,29 @@ class _BranchSelectionPageState extends State<BranchSelectionPage> {
   List<dynamic> collections = [];
   bool isLoading = true;
   Map<String, Set<String>> branchData = {};
+  final SessionService _sessionService = SessionService();
+  bool _isSessionActive = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchCollections();
+    _checkSessionAndFetch();
+  }
+
+  Future<void> _checkSessionAndFetch() async {
+    // Check if session is active
+    final isSessionActive = await _sessionService.refreshSessionStatus();
+    setState(() {
+      _isSessionActive = isSessionActive;
+    });
+
+    if (isSessionActive) {
+      _fetchCollections();
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> _fetchCollections() async {
@@ -122,26 +141,70 @@ class _BranchSelectionPageState extends State<BranchSelectionPage> {
           ),
         ],
       ),
-      body: isLoading
+      body: !_isSessionActive
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(const Color(0xFFFE8000)),
+                  Icon(
+                    Icons.access_time,
+                    size: 80 * scaleFactor,
+                    color: Colors.red[400],
                   ),
-                  SizedBox(height: 16 * scaleFactor),
+                  SizedBox(height: 24 * scaleFactor),
                   Text(
-                    'Loading branches...',
+                    'Session Ended',
+                    style: TextStyle(
+                      fontSize: 24 * scaleFactor,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red[700],
+                    ),
+                  ),
+                  SizedBox(height: 12 * scaleFactor),
+                  Text(
+                    'Browsing is not available.\nThe bidding session has ended.',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16 * scaleFactor,
                       color: Colors.grey[600],
                     ),
                   ),
+                  SizedBox(height: 32 * scaleFactor),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red[600],
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 32 * scaleFactor,
+                        vertical: 12 * scaleFactor,
+                      ),
+                    ),
+                    child: Text('Go Back'),
+                  ),
                 ],
               ),
             )
-          : branchData.isEmpty
+          : isLoading
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(const Color(0xFFFE8000)),
+                      ),
+                      SizedBox(height: 16 * scaleFactor),
+                      Text(
+                        'Loading branches...',
+                        style: TextStyle(
+                          fontSize: 16 * scaleFactor,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : branchData.isEmpty
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

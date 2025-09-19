@@ -61,6 +61,67 @@ class BiddingService {
     }
   }
 
+  // Check bid count for a specific user-account combination
+  Future<ApiResponse<int>> getBidCountForUserAccount({
+    required int userId,
+    required String accountNumber,
+  }) async {
+    try {
+      // Get all user biddings
+      final userBiddingsResponse = await getUserBiddings();
+      
+      if (!userBiddingsResponse.isSuccess || userBiddingsResponse.data == null) {
+        return ApiResponse<int>.error(
+          error: ApiError(
+            statusCode: 0,
+            message: 'Failed to get user biddings for count check',
+            type: ApiErrorType.unknown,
+          ),
+        );
+      }
+
+      // Get all products to match account numbers
+      final productsResponse = await getBiddingAccounts();
+      
+      if (!productsResponse.isSuccess || productsResponse.data == null) {
+        return ApiResponse<int>.error(
+          error: ApiError(
+            statusCode: 0,
+            message: 'Failed to get products for count check',
+            type: ApiErrorType.unknown,
+          ),
+        );
+      }
+
+      // Create a map of product ID to account number
+      final Map<int, String> productToAccount = {};
+      for (var product in productsResponse.data!) {
+        if (product['page']?['acc_num'] != null) {
+          productToAccount[product['id']] = product['page']['acc_num'];
+        }
+      }
+
+      // Count bids for the specific account
+      int bidCount = 0;
+      for (var bid in userBiddingsResponse.data!) {
+        final productId = bid['product'] as int?;
+        if (productId != null && productToAccount[productId] == accountNumber) {
+          bidCount++;
+        }
+      }
+
+      return ApiResponse<int>.success(data: bidCount);
+    } catch (e) {
+      return ApiResponse<int>.error(
+        error: ApiError(
+          statusCode: 0,
+          message: 'Failed to check bid count: ${e.toString()}',
+          type: ApiErrorType.unknown,
+        ),
+      );
+    }
+  }
+
   // Get bidding accounts/products
   Future<ApiResponse<List<dynamic>>> getBiddingAccounts() async {
     try {
