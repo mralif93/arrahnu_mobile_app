@@ -1,6 +1,6 @@
-import 'package:bmmb_pajak_gadai_i/components/QAvatar.dart';
-import 'package:bmmb_pajak_gadai_i/components/QButton.dart';
-import 'package:bmmb_pajak_gadai_i/components/QTextField.dart';
+import '../components/QAvatar.dart';
+import '../components/QButton.dart';
+import '../components/QTextField.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../model/user.dart';

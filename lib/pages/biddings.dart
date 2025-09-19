@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'package:bmmb_pajak_gadai_i/constant/style.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../model/bidding.dart';
