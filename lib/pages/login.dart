@@ -71,255 +71,292 @@ class _LoginPageState extends State<LoginPage> {
     
     return Scaffold(
       backgroundColor: AppTheme.backgroundWhite,
+      appBar: AppBar(
+        backgroundColor: AppTheme.primaryOrange,
+        foregroundColor: AppTheme.textWhite,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: AppTheme.textWhite),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const CampaignPage()),
+              (route) => false,
+            );
+          },
+        ),
+        title: Text(
+          'Login',
+          style: AppTheme.getAppBarTitleStyle(scaleFactor),
+        ),
+        centerTitle: true,
+      ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo section
-              Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: Colors.orange[50],
-                  borderRadius: BorderRadius.circular(60),
-                ),
-                child: Center(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: AppTheme.responsiveSize(24, scaleFactor),
+            vertical: AppTheme.responsiveSize(4, scaleFactor),
+          ),
+          child: IntrinsicHeight(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Logo section
+                Transform.translate(
+                  offset: Offset(0, AppTheme.responsiveSize(-8, scaleFactor)),
                   child: Image.asset(
                     "assets/images/muamalat_logo_01.png",
-                    width: 80,
-                    height: 80,
+                    width: AppTheme.responsiveSize(280, scaleFactor),
+                    height: AppTheme.responsiveSize(120, scaleFactor),
+                    fit: BoxFit.contain,
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 48),
+                SizedBox(height: AppTheme.responsiveSize(8, scaleFactor)),
 
-              // Welcome text
-              Text(
-                'Welcome Back',
-                style: AppTheme.getWelcomeStyle(scaleFactor),
-              ),
-
-              SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
-
-              Text(
-                'Sign in to continue',
-                style: AppTheme.getCaptionStyle(scaleFactor),
-              ),
-
-              const SizedBox(height: 48),
-
-              // Email field
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.next,
-                style: const TextStyle(fontSize: 16),
-                decoration: InputDecoration(
-                  hintText: 'Email or Username',
-                  hintStyle: TextStyle(
-                    color: Colors.grey[500],
-                    fontSize: 16,
+                // Welcome text
+                Text(
+                  'Welcome Back',
+                  style: TextStyle(
+                    fontSize: AppTheme.responsiveSize(20, scaleFactor),
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[800],
                   ),
-                  prefixIcon: Icon(
-                    Icons.person_outline,
+                ),
+
+                SizedBox(height: AppTheme.responsiveSize(4, scaleFactor)),
+
+                Text(
+                  'Sign in to continue',
+                  style: TextStyle(
+                    fontSize: AppTheme.responsiveSize(12, scaleFactor),
+                    fontWeight: FontWeight.w400,
                     color: Colors.grey[600],
-                    size: 20,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: Colors.grey[200]!,
-                      width: 1,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: Colors.orange,
-                      width: 2,
-                    ),
-                  ),
-                  fillColor: Colors.grey[50],
-                  filled: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 20,
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 20),
+                SizedBox(height: AppTheme.responsiveSize(24, scaleFactor)),
 
-              // Password field
-              TextFormField(
-                controller: _passwordController,
-                obscureText: true,
-                textInputAction: TextInputAction.done,
-                onFieldSubmitted: (_) => signUserIn(),
-                style: const TextStyle(fontSize: 16),
-                decoration: InputDecoration(
-                  hintText: 'Password',
-                  hintStyle: TextStyle(
-                    color: Colors.grey[500],
-                    fontSize: 16,
+                // Email field
+                TextFormField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  style: TextStyle(
+                    fontSize: AppTheme.responsiveSize(16, scaleFactor),
+                    fontWeight: FontWeight.w400,
                   ),
-                  prefixIcon: Icon(
-                    Icons.lock_outline,
-                    color: Colors.grey[600],
-                    size: 20,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: Colors.grey[200]!,
-                      width: 1,
+                  decoration: InputDecoration(
+                    hintText: 'Email or Username',
+                    hintStyle: TextStyle(
+                      color: Colors.grey[500],
+                      fontSize: AppTheme.responsiveSize(12, scaleFactor),
+                      fontWeight: FontWeight.w400,
                     ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: Colors.orange,
-                      width: 2,
+                    prefixIcon: Icon(
+                      Icons.person_outline,
+                      color: Colors.grey[600],
+                      size: 20,
                     ),
-                  ),
-                  fillColor: Colors.grey[50],
-                  filled: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 20,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Forgot password
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () async {
-                    Uri resetPassword = Uri.parse('${Variables.baseUrl}${Variables.passwordResetUrl}');
-                    if (await canLaunchUrl(resetPassword)) {
-                      await launchUrl(resetPassword);
-                    }
-                  },
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-                  ),
-                  child: Text(
-                    'Forgot Password?',
-                    style: TextStyle(
-                      color: Colors.orange[600],
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Sign in button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: signUserIn,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
+                    border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
                     ),
-                  ),
-                  child: const Text(
-                    'Sign In',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Divider
-              Row(
-                children: [
-                  Expanded(
-                    child: Divider(
-                      color: Colors.grey[300],
-                      thickness: 1,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      'or',
-                      style: TextStyle(
-                        color: Colors.grey[500],
-                        fontSize: 14,
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: Colors.grey[200]!,
+                        width: 1,
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Divider(
-                      color: Colors.grey[300],
-                      thickness: 1,
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: Colors.orange,
+                        width: 2,
+                      ),
+                    ),
+                    fillColor: Colors.grey[50],
+                    filled: true,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: AppTheme.responsiveSize(16, scaleFactor),
+                      vertical: AppTheme.responsiveSize(12, scaleFactor),
                     ),
                   ),
-                ],
-              ),
+                ),
 
-              const SizedBox(height: 32),
+                const SizedBox(height: 20),
 
-              // Sign up link
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Don\'t have an account? ',
-                    style: TextStyle(
+                // Password field
+                TextFormField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => signUserIn(),
+                  style: TextStyle(
+                    fontSize: AppTheme.responsiveSize(16, scaleFactor),
+                    fontWeight: FontWeight.w400,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                hintStyle: TextStyle(
+                  color: Colors.grey[500],
+                  fontSize: AppTheme.responsiveSize(12, scaleFactor),
+                  fontWeight: FontWeight.w400,
+                ),
+                    prefixIcon: Icon(
+                      Icons.lock_outline,
                       color: Colors.grey[600],
-                      fontSize: 14,
+                      size: 20,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: Colors.grey[200]!,
+                        width: 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: Colors.orange,
+                        width: 2,
+                      ),
+                    ),
+                    fillColor: Colors.grey[50],
+                    filled: true,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: AppTheme.responsiveSize(16, scaleFactor),
+                      vertical: AppTheme.responsiveSize(12, scaleFactor),
                     ),
                   ),
-                  TextButton(
+                ),
+
+                SizedBox(height: AppTheme.responsiveSize(8, scaleFactor)),
+
+                // Forgot password
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
                     onPressed: () async {
-                      Uri registerUrl = Uri.parse("${Variables.baseUrl}${Variables.signupUrl}");
-                      if (await canLaunchUrl(registerUrl)) {
-                        await launchUrl(registerUrl);
+                      Uri resetPassword = Uri.parse('${Variables.baseUrl}${Variables.passwordResetUrl}');
+                      if (await canLaunchUrl(resetPassword)) {
+                        await launchUrl(resetPassword);
                       }
                     },
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
                     ),
                     child: Text(
-                      'Sign Up',
+                      'Forgot Password?',
                       style: TextStyle(
                         color: Colors.orange[600],
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
+                        fontSize: AppTheme.responsiveSize(12, scaleFactor),
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
-                ],
-              ),
-            ],
+                ),
+
+                SizedBox(height: AppTheme.responsiveSize(16, scaleFactor)),
+
+                // Sign in button
+                SizedBox(
+                  width: double.infinity,
+                  height: AppTheme.responsiveSize(48, scaleFactor),
+                  child: ElevatedButton(
+                    onPressed: signUserIn,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                      child: Text(
+                        'Sign In',
+                        style: TextStyle(
+                          fontSize: AppTheme.responsiveSize(12, scaleFactor),
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                  ),
+                ),
+
+                SizedBox(height: AppTheme.responsiveSize(16, scaleFactor)),
+
+                // Divider
+                Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        color: Colors.grey[300],
+                        thickness: 1,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'or',
+                        style: TextStyle(
+                          color: Colors.grey[500],
+                          fontSize: AppTheme.responsiveSize(14, scaleFactor),
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        color: Colors.grey[300],
+                        thickness: 1,
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: AppTheme.responsiveSize(16, scaleFactor)),
+
+                // Sign up link
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Don\'t have an account? ',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: AppTheme.responsiveSize(12, scaleFactor),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        Uri registerUrl = Uri.parse("${Variables.baseUrl}${Variables.signupUrl}");
+                        if (await canLaunchUrl(registerUrl)) {
+                          await launchUrl(registerUrl);
+                        }
+                      },
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                      ),
+                      child: Text(
+                        'Sign Up',
+                        style: TextStyle(
+                          color: Colors.orange[600],
+                          fontWeight: FontWeight.w600,
+                          fontSize: AppTheme.responsiveSize(12, scaleFactor),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

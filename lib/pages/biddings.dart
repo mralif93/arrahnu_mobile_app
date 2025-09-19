@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../model/bidding.dart';
 import '../theme/app_theme.dart';
 import '../pages/navigation.dart';
+import '../pages/login.dart';
 import '../controllers/authorization.dart';
 
 class BiddingPage extends StatefulWidget {
@@ -69,7 +70,7 @@ class _BiddingPageState extends State<BiddingPage> {
     if (!res) {
       Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => NavigationPage()),
+          MaterialPageRoute(builder: (context) => const LoginPage()),
           (route) => false);
       return;
     }
@@ -79,60 +80,108 @@ class _BiddingPageState extends State<BiddingPage> {
   Widget build(BuildContext context) {
     final scaleFactor = AppTheme.getScaleFactor(context);
     
-    return Scaffold(
-      backgroundColor: AppTheme.backgroundLight,
-      appBar: AppBar(
-        backgroundColor: AppTheme.primaryOrange,
-        foregroundColor: AppTheme.textWhite,
-        elevation: 0,
-        title: Text(
-          "My Biddings",
-          style: AppTheme.getAppBarTitleStyle(scaleFactor),
-        ),
-        centerTitle: true,
-      ),
-      body: FutureBuilder<List<Bidding>>(
-        future: biddingsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return _buildLoadingState(scaleFactor);
-          } else if (snapshot.hasData && biddingsData.isNotEmpty) {
-            return _buildBiddingsList(scaleFactor);
-          } else {
-            return _buildEmptyState(scaleFactor);
-          }
-        },
-      ),
+    return FutureBuilder<List<Bidding>>(
+      future: biddingsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _buildLoadingState(scaleFactor);
+        } else {
+          return Scaffold(
+            backgroundColor: AppTheme.backgroundLight,
+            appBar: AppBar(
+              backgroundColor: AppTheme.primaryOrange,
+              foregroundColor: AppTheme.textWhite,
+              elevation: 0,
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    "assets/images/muamalat_logo_01.png",
+                    width: AppTheme.responsiveSize(180, scaleFactor),
+                    height: AppTheme.responsiveSize(60, scaleFactor),
+                    fit: BoxFit.contain,
+                  ),
+                  SizedBox(width: AppTheme.responsiveSize(8, scaleFactor)),
+                  Text(
+                    "My Biddings",
+                    style: AppTheme.getAppBarTitleStyle(scaleFactor),
+                  ),
+                ],
+              ),
+              centerTitle: true,
+            ),
+            body: snapshot.hasData && biddingsData.isNotEmpty
+                ? _buildBiddingsList(scaleFactor)
+                : _buildEmptyState(scaleFactor),
+          );
+        }
+      },
     );
   }
 
   // Modern loading state
   Widget _buildLoadingState(double scaleFactor) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: AppTheme.responsiveSize(50, scaleFactor),
-            height: AppTheme.responsiveSize(50, scaleFactor),
-            decoration: BoxDecoration(
-              color: AppTheme.primaryOrange,
-              borderRadius: BorderRadius.circular(AppTheme.responsiveSize(25, scaleFactor)),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        child: GridView.count(
+          crossAxisCount: 1,
+          mainAxisSpacing: 0,
+          crossAxisSpacing: 0,
+          childAspectRatio: 1.0,
+          children: [
+            // Centered content using Grid
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Bank Muamalat Logo
+                  Container(
+                    width: 200,
+                    height: 80,
+                    child: Image.asset(
+                      "assets/images/muamalat_logo_01.png",
+                      fit: BoxFit.contain,
+                      alignment: Alignment.center,
+                    ),
+                  ),
+                  
+                  SizedBox(height: 60),
+                  
+                  // Circular Progress Indicator
+                  SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryOrange),
+                      strokeWidth: 4,
+                      backgroundColor: AppTheme.primaryOrange.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  
+                  SizedBox(height: 30),
+                  
+                  // Loading text
+                  Container(
+                    width: 250,
+                    child: Text(
+                      'Loading bidding information...',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            child: const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              strokeWidth: 3,
-            ),
-          ),
-          SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
-          Text(
-            'Loading your biddings...',
-            style: AppTheme.getBodyStyle(scaleFactor).copyWith(
-              color: AppTheme.textMuted,
-              fontWeight: AppTheme.fontWeightMedium,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

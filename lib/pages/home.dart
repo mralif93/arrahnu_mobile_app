@@ -117,8 +117,8 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Image.asset(
                       "assets/images/muamalat_logo_01.png",
-                      width: double.infinity,
-                      height: AppTheme.responsiveSize(80, scaleFactor),
+                      width: AppTheme.responsiveSize(280, scaleFactor),
+                      height: AppTheme.responsiveSize(120, scaleFactor),
                       fit: BoxFit.contain,
                     ),
                   ],
@@ -134,26 +134,31 @@ class _HomePageState extends State<HomePage> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Container(
                       padding: EdgeInsets.all(AppTheme.responsiveSize(40, scaleFactor)),
-                      child: Column(
-                        children: [
-                          Container(
-                            width: AppTheme.responsiveSize(60, scaleFactor),
-                            height: AppTheme.responsiveSize(60, scaleFactor),
-                            decoration: BoxDecoration(
-                              color: AppTheme.primaryOrange.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusCircular, scaleFactor)),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: AppTheme.responsiveSize(60, scaleFactor),
+                              height: AppTheme.responsiveSize(60, scaleFactor),
+                              decoration: BoxDecoration(
+                                color: AppTheme.primaryOrange.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusCircular, scaleFactor)),
+                              ),
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryOrange),
+                                strokeWidth: 3,
+                              ),
                             ),
-                            child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryOrange),
-                              strokeWidth: 3,
+                            SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXLarge, scaleFactor)),
+                            Text(
+                              'Loading bidding information...',
+                              style: AppTheme.getBodyStyle(scaleFactor),
+                              textAlign: TextAlign.center,
                             ),
-                          ),
-                          SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXLarge, scaleFactor)),
-                          Text(
-                            'Loading bidding information...',
-                            style: AppTheme.getBodyStyle(scaleFactor),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
                   } else if (snapshot.hasError) {

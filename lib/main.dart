@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'theme/theme_provider.dart';
-import 'pages/campaign.dart';
+import 'pages/simple_splash_screen.dart';
 import 'constant/variables.dart';
 
 void main() async {
@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: Variables.appName,
       theme: Provider.of<ThemeProvider>(context).themeData,
-      home: const CampaignPage(),
+      home: const SimpleSplashScreen(),
       builder: EasyLoading.init(),
     );
   }

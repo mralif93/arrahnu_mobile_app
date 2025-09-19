@@ -78,6 +78,7 @@ flutter:
   #---------- LOCAL ASSETS ----------#
   assets:
     - assets/images/
+    - assets/splash.png
     - .env
 
   #---------- LOCAL FONTS ----------#

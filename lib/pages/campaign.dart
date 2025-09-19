@@ -90,8 +90,8 @@ class _CampaignPageState extends State<CampaignPage> {
                   children: [
                     Image.asset(
                       "assets/images/muamalat_logo_01.png",
-                      width: double.infinity,
-                      height: 120,
+                      width: AppTheme.responsiveSize(280, AppTheme.getScaleFactor(context)),
+                      height: AppTheme.responsiveSize(120, AppTheme.getScaleFactor(context)),
                       fit: BoxFit.contain,
                     ),
                   ],

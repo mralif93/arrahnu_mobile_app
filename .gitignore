@@ -48,3 +48,20 @@ app.*.map.json
 # Environment variables
 .env
 .env.example
+
+# Flutter
+.flutter-plugins-dependencies
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+
+# iOS
+ios/
+
+# Android
+android/
+
+# Test
+test/
