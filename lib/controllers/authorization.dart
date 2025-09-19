@@ -1,11 +1,8 @@
-import 'dart:convert';
 import 'dart:math';
 import '../model/user.dart';
 import '../storage/secure_storage.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import '../constant/variables.dart';
 import '../services/auth_service.dart';
 import '../services/bidding_service.dart';
 import '../models/api_response.dart';
@@ -168,7 +165,7 @@ class AuthController {
   }
 
   // Get Gold Prices
-  Future<ApiResponse<Map<String, dynamic>>> getGoldPrices() async {
+  Future<ApiResponse<List<dynamic>>> getGoldPrices() async {
     return await _biddingService.getGoldPrices();
   }
 

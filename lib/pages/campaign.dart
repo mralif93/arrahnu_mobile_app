@@ -5,19 +5,15 @@ import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'dart:convert';
 
-import '../components/QCard.dart';
 import '../constant/variables.dart';
 import '../theme/app_theme.dart';
 import 'home.dart';
-import 'account.dart';
 import 'dashboard.dart';
 import 'login.dart';
 import 'features.dart';
 import 'prices.dart';
 import 'calculator.dart';
-import 'branch.dart';
 import '../controllers/authorization.dart';
-import '../storage/secure_storage.dart';
 
 class CampaignPage extends StatefulWidget {
   const CampaignPage({super.key});
@@ -135,7 +131,7 @@ class _CampaignPageState extends State<CampaignPage> {
                 padding: EdgeInsets.all(AppTheme.spacingXLarge),
                 decoration: AppTheme.getCardDecoration(scaleFactor),
                 child: SizedBox(
-                  height: 80,
+                  height: 100,
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     children: [
@@ -172,13 +168,6 @@ class _CampaignPageState extends State<CampaignPage> {
                         title: 'Calculator',
                         color: const Color(0xFF06B6D4),
                         onTap: () => Get.to(const CalculatorPage()),
-                      ),
-                      const SizedBox(width: 12),
-                      _buildActionCard(
-                        icon: Icons.location_on_outlined,
-                        title: 'Branches',
-                        color: const Color(0xFFEF4444),
-                        onTap: () => Get.to(const BranchPage()),
                       ),
                     ],
                   ),
@@ -313,8 +302,8 @@ class _CampaignPageState extends State<CampaignPage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: AppTheme.responsiveSize(80, scaleFactor),
-        height: AppTheme.responsiveSize(80, scaleFactor),
+        width: AppTheme.responsiveSize(90, scaleFactor),
+        height: AppTheme.responsiveSize(90, scaleFactor),
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusLarge, scaleFactor)),
@@ -327,30 +316,35 @@ class _CampaignPageState extends State<CampaignPage> {
             ),
           ],
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: EdgeInsets.all(AppTheme.responsiveSize(12, scaleFactor)),
+        child: Padding(
+          padding: EdgeInsets.all(AppTheme.responsiveSize(8, scaleFactor)),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: EdgeInsets.all(AppTheme.responsiveSize(12, scaleFactor)),
               child: Icon(
                 icon,
                 color: color,
-                size: AppTheme.responsiveSize(AppTheme.iconXXLarge, scaleFactor),
+                size: AppTheme.responsiveSize(AppTheme.iconXXXLarge, scaleFactor),
               ),
-            ),
-            SizedBox(height: AppTheme.spacingTiny),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: AppTheme.responsiveSize(AppTheme.fontSizeSmall, scaleFactor),
-                fontWeight: AppTheme.fontWeightSemiBold,
-                color: color,
               ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+              SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
+              Flexible(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: AppTheme.responsiveSize(AppTheme.fontSizeSmall, scaleFactor),
+                    fontWeight: AppTheme.fontWeightSemiBold,
+                    color: color,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

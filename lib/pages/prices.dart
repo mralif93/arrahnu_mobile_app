@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import '../constant/variables.dart';
 import '../controllers/authorization.dart';
+import '../theme/app_theme.dart';
 
 class PricesPage extends StatefulWidget {
   const PricesPage({super.key});
@@ -13,110 +10,260 @@ class PricesPage extends StatefulWidget {
 }
 
 class _PricesPageState extends State<PricesPage> {
-  // Style
-  final textHeaderStyle = const TextStyle(
-    fontWeight: FontWeight.bold,
-    color: Colors.black,
-  );
+  List<dynamic> goldPrices = [];
+  bool isLoading = true;
+  String? errorMessage;
 
-  final titleStyle = const TextStyle(
-    fontWeight: FontWeight.bold,
-    color: Colors.white,
-    fontSize: 16,
-  );
+  @override
+  void initState() {
+    super.initState();
+    _loadGoldPrices();
+  }
 
-  final subtitleStyle = const TextStyle(
-    fontWeight: FontWeight.normal,
-    color: Colors.white,
-    fontSize: 12,
-  );
+  Future<void> _loadGoldPrices() async {
+    try {
+      final response = await AuthController().getGoldPrices();
+      
+      if (response.isSuccess && response.data != null) {
+        setState(() {
+          goldPrices = response.data!;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          errorMessage = response.error?.message ?? 'Failed to load gold prices';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Error loading gold prices: $e';
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final scaleFactor = AppTheme.getScaleFactor(context);
+    
     return Scaffold(
+      backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
-        title: Text('BMMB Pajak Gadai-i', style: textHeaderStyle),
+        title: Text(
+          'Gold Prices',
+          style: AppTheme.getAppBarTitleStyle(scaleFactor),
+        ),
+        backgroundColor: AppTheme.primaryOrange,
+        elevation: 0,
+        centerTitle: true,
+        foregroundColor: AppTheme.textWhite,
       ),
-      body: SingleChildScrollView(
-        child: FutureBuilder(
-          future: goldPrices(),
-          builder: (context, snapshot) {
-            List<Widget> children = [];
-
-            if (snapshot.hasData) {
-              // Dismiss Loading
-              EasyLoading.dismiss();
-
-              final data = snapshot.data;
-              children = <Widget>[
-                ListView.separated(
-                  itemCount: data.length,
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    final goldPrice = data[index];
-                    return ListTile(
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Gold Standard: ${goldPrice['title']}',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 16)),
-                          ],
-                        ),
-                        leading: const Icon(Icons.attach_money_outlined),
-                        trailing: Text('RM ${goldPrice['gold_price']}/g'));
-                  },
-                  separatorBuilder: (context, index) {
-                    return const Divider(height: 1);
-                  },
-                ),
-                const Divider(height: 1),
-              ];
-            } else if (snapshot.hasError) {
-              // Dismiss Loading
-              EasyLoading.dismiss();
-
-              children = <Widget>[
-                const Icon(
-                  Icons.error_outline,
-                  color: Colors.red,
-                  size: 60,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Text('Error: ${snapshot.error}'),
-                ),
-              ];
-            } else {
-              // Show Loading
-              EasyLoading.instance
-                ..indicatorType = EasyLoadingIndicatorType.fadingCircle
-                ..loadingStyle = EasyLoadingStyle.dark;
-              EasyLoading.show(status: 'Please wait');
-
-              children = const <Widget>[];
-            }
-
-            return Center(
+      body: isLoading
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: children,
+                children: [
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryOrange),
+                  ),
+                  SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
+                  Text(
+                    'Loading gold prices...',
+                    style: AppTheme.getBodyStyle(scaleFactor),
+                  ),
+                ],
               ),
-            );
-          },
-        ),
-      ),
+            )
+          : errorMessage != null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: AppTheme.responsiveSize(AppTheme.iconXXXLarge, scaleFactor),
+                        color: AppTheme.secondaryRed,
+                      ),
+                      SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
+                      Text(
+                        'Unable to Load Data',
+                        style: AppTheme.getHeaderStyle(scaleFactor).copyWith(
+                          color: AppTheme.secondaryRed,
+                        ),
+                      ),
+                      SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
+                      Text(
+                        errorMessage!,
+                        style: AppTheme.getBodyStyle(scaleFactor),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
+                      ElevatedButton(
+                        onPressed: _loadGoldPrices,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryOrange,
+                          foregroundColor: AppTheme.textWhite,
+                        ),
+                        child: Text('Retry'),
+                      ),
+                    ],
+                  ),
+                )
+              : goldPrices.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: AppTheme.responsiveSize(AppTheme.iconXXXLarge, scaleFactor),
+                            color: AppTheme.textMuted,
+                          ),
+                          SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
+                          Text(
+                            'No Gold Prices Available',
+                            style: AppTheme.getHeaderStyle(scaleFactor),
+                          ),
+                          SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
+                          Text(
+                            'Please try again later',
+                            style: AppTheme.getBodyStyle(scaleFactor),
+                          ),
+                        ],
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _loadGoldPrices,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: ListView.builder(
+                              padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
+                              itemCount: goldPrices.length,
+                              itemBuilder: (context, index) {
+                                final goldPrice = goldPrices[index];
+                                return Container(
+                                  margin: EdgeInsets.only(bottom: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
+                                  padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
+                                  decoration: AppTheme.getCardDecoration(scaleFactor),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: AppTheme.getIconCirclePadding(scaleFactor),
+                                        decoration: AppTheme.getIconCircleDecoration(AppTheme.primaryOrange, scaleFactor),
+                                        child: Icon(
+                                          Icons.attach_money,
+                                          color: AppTheme.primaryOrange,
+                                          size: AppTheme.responsiveSize(AppTheme.iconLarge, scaleFactor),
+                                        ),
+                                      ),
+                                      SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              goldPrice['title'] ?? 'Unknown Gold Type',
+                                              style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                                                fontWeight: AppTheme.fontWeightBold,
+                                                color: AppTheme.textPrimary,
+                                              ),
+                                            ),
+                                            SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
+                                            Text(
+                                              'Gold Standard',
+                                              style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
+                                                color: AppTheme.textMuted,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Text(
+                                        'RM ${goldPrice['gold_price'] ?? 'N/A'}/g',
+                                        style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                                          fontWeight: AppTheme.fontWeightBold,
+                                          color: AppTheme.primaryOrange,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          // Information note at the bottom
+                          Container(
+                            width: double.infinity,
+                            margin: EdgeInsets.only(
+                              left: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
+                              right: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
+                              top: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
+                              bottom: AppTheme.responsiveSize(AppTheme.spacingLarge * 4, scaleFactor),
+                            ),
+                            padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
+                            decoration: BoxDecoration(
+                              color: AppTheme.backgroundLight,
+                              borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusMedium, scaleFactor)),
+                              border: Border.all(
+                                color: AppTheme.primaryOrange.withValues(alpha: 0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.info_outline,
+                                      size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
+                                      color: AppTheme.primaryOrange,
+                                    ),
+                                    SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
+                                    Text(
+                                      'Price Information',
+                                      style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                                        fontWeight: AppTheme.fontWeightBold,
+                                        color: AppTheme.primaryOrange,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
+                                Text(
+                                  'Gold prices are sourced from BMMB (Bank Muamalat Malaysia Berhad) and are updated regularly. Prices are for reference only and may vary based on market conditions.',
+                                  style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
+                                    color: AppTheme.textMuted,
+                                    height: 1.4,
+                                  ),
+                                  textAlign: TextAlign.justify,
+                                ),
+                                SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.update,
+                                      size: AppTheme.responsiveSize(AppTheme.iconSmall, scaleFactor),
+                                      color: AppTheme.textMuted,
+                                    ),
+                                    SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
+                                    Text(
+                                      'Last updated: ${DateTime.now().toString().split(' ')[0]}',
+                                      style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
+                                        color: AppTheme.textMuted,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
     );
   }
 
-  Future goldPrices() async {
-    final response = await AuthController().getGoldPrices();
-    
-    if (response.isSuccess && response.data != null) {
-      return response.data!;
-    }
-    
-    throw Exception(response.error?.userMessage ?? Variables.failedLoadBidInfoText);
-  }
 }

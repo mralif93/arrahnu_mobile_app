@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math';
 import 'package:intl/intl.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -233,18 +232,18 @@ class BiddingService {
   }
 
   // Get gold prices
-  Future<ApiResponse<Map<String, dynamic>>> getGoldPrices() async {
+  Future<ApiResponse<List<dynamic>>> getGoldPrices() async {
     try {
-      final response = await _apiService.get<Map<String, dynamic>>(
+      final response = await _apiService.get<List<dynamic>>(
         Variables.apiGoldPriceEndpoint,
-        fromJson: (data) => data,
+        fromJson: (data) => data is List ? data : [],
         requiresAuth: false,
         showLoading: true,
       );
 
       return response;
     } catch (e) {
-      return ApiResponse<Map<String, dynamic>>.error(
+      return ApiResponse<List<dynamic>>.error(
         error: ApiError(
           statusCode: 0,
           message: 'Failed to get gold prices: ${e.toString()}',

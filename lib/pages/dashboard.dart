@@ -517,7 +517,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
+        padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
         decoration: AppTheme.getCardDecoration(scaleFactor),
         child: Column(
           children: [
@@ -527,25 +527,33 @@ class _DashboardPageState extends State<DashboardPage> {
               child: Icon(
                 icon,
                 color: color,
-                size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
+                size: AppTheme.responsiveSize(AppTheme.iconLarge, scaleFactor),
               ),
             ),
             SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
-            Text(
-              title,
-              style: AppTheme.getBodyStyle(scaleFactor).copyWith(
-                fontWeight: AppTheme.fontWeightBold,
-                color: AppTheme.textPrimary,
+            Flexible(
+              child: Text(
+                title,
+                style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                  fontWeight: AppTheme.fontWeightBold,
+                  color: AppTheme.textPrimary,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-              textAlign: TextAlign.center,
             ),
             SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
-            Text(
-              subtitle,
-              style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
-                color: AppTheme.textMuted,
+            Flexible(
+              child: Text(
+                subtitle,
+                style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
+                  color: AppTheme.textMuted,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),
