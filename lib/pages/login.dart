@@ -245,9 +245,11 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () async {
                       try {
                         Uri resetPassword = Uri.parse('${Variables.baseUrl}${Variables.passwordResetUrl}');
+                        print('Forgot Password URL: $resetPassword');
                         if (await canLaunchUrl(resetPassword)) {
                           await launchUrl(resetPassword, mode: LaunchMode.externalApplication);
                         } else {
+                          print('Cannot launch forgot password URL: $resetPassword');
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Cannot open forgot password page. Please try again later.'),
@@ -256,10 +258,11 @@ class _LoginPageState extends State<LoginPage> {
                           );
                         }
                       } catch (e) {
+                        print('Error launching forgot password URL: $e');
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Error opening forgot password page. Please try again later.'),
-                            duration: Duration(seconds: 3),
+                          SnackBar(
+                            content: Text('Error opening forgot password page: $e'),
+                            duration: const Duration(seconds: 3),
                           ),
                         );
                       }
@@ -354,9 +357,11 @@ class _LoginPageState extends State<LoginPage> {
                       onPressed: () async {
                         try {
                           Uri registerUrl = Uri.parse("${Variables.baseUrl}${Variables.signupUrl}");
+                          print('Sign Up URL: $registerUrl');
                           if (await canLaunchUrl(registerUrl)) {
                             await launchUrl(registerUrl, mode: LaunchMode.externalApplication);
                           } else {
+                            print('Cannot launch sign up URL: $registerUrl');
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Cannot open sign up page. Please try again later.'),
@@ -365,10 +370,11 @@ class _LoginPageState extends State<LoginPage> {
                             );
                           }
                         } catch (e) {
+                          print('Error launching sign up URL: $e');
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Error opening sign up page. Please try again later.'),
-                              duration: Duration(seconds: 3),
+                            SnackBar(
+                              content: Text('Error opening sign up page: $e'),
+                              duration: const Duration(seconds: 3),
                             ),
                           );
                         }
