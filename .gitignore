@@ -58,10 +58,10 @@ app.*.map.json
 /build/
 
 # iOS
-ios/
+# ios/
 
 # Android
-android/
+# android/
 
 # Test
 test/
