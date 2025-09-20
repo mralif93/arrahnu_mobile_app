@@ -1,4 +1,4 @@
-package my.com.muamalat.digital.arrahnu;
+package my.com.muamalat.digital.arrahnuonline;
 
 import android.app.Activity;
 import android.content.Intent;
