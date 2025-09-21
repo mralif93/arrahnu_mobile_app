@@ -429,9 +429,11 @@ class _CampaignPageState extends State<CampaignPage> {
           await http.get(Uri.parse('${Variables.baseUrl}/api/announcement/'));
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = jsonDecode(response.body);
-        setState(() {
-          items = jsonData['results'];
-        });
+        if (mounted) {
+          setState(() {
+            items = jsonData['results'];
+          });
+        }
       }
     } catch (e) {
       print('Error fetching poster: $e');
@@ -453,20 +455,26 @@ class _CampaignPageState extends State<CampaignPage> {
           if (currentDate.compareTo(startDate) == 1 &&
               currentDate.compareTo(endDate) == -1) {
             print('Bidding is active!');
-            setState(() {
-              statusView = true;
-            });
+            if (mounted) {
+              setState(() {
+                statusView = true;
+              });
+            }
           } else if (currentDate.compareTo(startDate) == -1) {
             print('Bidding has not started yet!');
-            setState(() {
-              statusView = false;
-            });
+            if (mounted) {
+              setState(() {
+                statusView = false;
+              });
+            }
           } else if (currentDate.compareTo(endDate) == 1 ||
               currentDate.compareTo(endDate) == 0) {
             print('Already Done Bidding!');
-            setState(() {
-              statusView = false;
-            });
+            if (mounted) {
+              setState(() {
+                statusView = false;
+              });
+            }
           }
         }
       }

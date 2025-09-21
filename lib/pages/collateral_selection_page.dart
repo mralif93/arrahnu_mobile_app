@@ -114,9 +114,11 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
       return;
     }
 
-    setState(() {
-      _isSubmitting = true;
-    });
+    if (mounted) {
+      setState(() {
+        _isSubmitting = true;
+      });
+    }
 
     try {
       final bidAmount = double.parse(_bidController.text);
@@ -148,9 +150,11 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
 
       if (allSuccess) {
         // Update bid count after successful submission
-        setState(() {
-          _currentBidCount++;
-        });
+        if (mounted) {
+          setState(() {
+            _currentBidCount++;
+          });
+        }
         
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

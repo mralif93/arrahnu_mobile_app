@@ -43,11 +43,19 @@ class _HomePageState extends State<HomePage> {
     _initializeSession();
   }
 
+  @override
+  void dispose() {
+    _sessionService.dispose();
+    super.dispose();
+  }
+
   Future<void> _initializeSession() async {
     await _sessionService.initializeSession();
-    setState(() {
-      _isSessionActive = _sessionService.isSessionActive;
-    });
+    if (mounted) {
+      setState(() {
+        _isSessionActive = _sessionService.isSessionActive;
+      });
+    }
     
     // Listen to session status changes
     _sessionService.sessionStatusStream.listen((isActive) {
@@ -78,12 +86,6 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     }
-  }
-
-  @override
-  void dispose() {
-    _sessionService.dispose();
-    super.dispose();
   }
 
   @override

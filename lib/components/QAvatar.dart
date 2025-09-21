@@ -15,36 +15,70 @@ class QAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         // Avatar image
         SizedBox(
           width: 130,
           height: 130,
-          child: Image.network(image),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(65),
+            child: Image.network(
+              image,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  width: 130,
+                  height: 130,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(65),
+                  ),
+                  child: const Icon(
+                    Icons.person,
+                    size: 60,
+                    color: Colors.grey,
+                  ),
+                );
+              },
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Container(
+                  width: 130,
+                  height: 130,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(65),
+                  ),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
 
         // space
         const SizedBox(height: 12),
 
-        // name
-        if (name.isNotEmpty)
-          Text(
-            name,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+        // name - always render to maintain consistent layout
+        Text(
+          name.isNotEmpty ? name : 'User',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
 
         // space
-        if (name.isNotEmpty) const SizedBox(height: 6),
+        const SizedBox(height: 6),
 
-        // mobile
-        if (mobile.isNotEmpty)
-          Text(
-            mobile,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+        // mobile - always render to maintain consistent layout
+        Text(
+          mobile.isNotEmpty ? mobile : 'No mobile number',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
 
         // space
-        if (mobile.isNotEmpty) const SizedBox(height: 12),
+        const SizedBox(height: 12),
       ],
     );
   }

@@ -6,6 +6,7 @@ import 'dart:convert';
 import '../components/QAvatar.dart';
 import '../components/QButton.dart';
 import '../components/QListTiles.dart';
+import '../components/sweet_alert.dart';
 import '../constant/variables.dart';
 import '../theme/app_theme.dart';
 import '../controllers/authorization.dart';
@@ -17,6 +18,8 @@ import 'profile.dart';
 import 'home.dart';
 import 'prices.dart';
 import 'calculator.dart';
+import 'login.dart';
+import 'campaign.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -54,42 +57,37 @@ class _DashboardPageState extends State<DashboardPage> {
   void checkSession() async {
     final res = await AuthController().session();
     if (!res) {
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => NavigationPage()),
-          (route) => false);
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginPage()),
+            (route) => false);
+      }
       return;
     }
   }
 
-  void fetchProfile() async {
+  Future<void> fetchProfile() async {
     final response = await AuthController().getUserProfile();
     if (response.isSuccess && response.data != null) {
-      setState(() {
-        profile = response.data!;
-      });
+      if (mounted) {
+        setState(() {
+          profile = response.data!;
+        });
+      }
     }
   }
 
   void _showLogoutDialog() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Get.back();
-              await _performLogout();
-            },
-            child: const Text('Sign Out'),
-          ),
-        ],
-      ),
+    SweetAlert.confirm(
+      title: 'Sign Out',
+      message: 'Are you sure you want to sign out?',
+      confirmText: 'Sign Out',
+      cancelText: 'Cancel',
+      confirmColor: Colors.red,
+      onConfirm: () async {
+        await _performLogout();
+      },
     );
   }
 
@@ -118,8 +116,8 @@ class _DashboardPageState extends State<DashboardPage> {
           duration: const Duration(seconds: 2),
         );
         
-        // Navigate to login page
-        Get.offAll(const NavigationPage());
+        // Navigate to campaign page
+        Get.offAll(const CampaignPage());
       } else {
         // Show error message
         Get.snackbar(
@@ -147,7 +145,7 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  void checkBidingTime() async {
+  Future<void> checkBidingTime() async {
     try {
       var response = await http.get(Uri.parse(
           '${Variables.baseUrl}/api/v2/pages/?type=product.BranchIndexPage&fields=*'));
@@ -162,20 +160,26 @@ class _DashboardPageState extends State<DashboardPage> {
           if (currentDate.compareTo(startDate) == 1 &&
               currentDate.compareTo(endDate) == -1) {
             print('Bidding is active!');
-            setState(() {
-              statusView = true;
-            });
+            if (mounted) {
+              setState(() {
+                statusView = true;
+              });
+            }
           } else if (currentDate.compareTo(startDate) == -1) {
             print('Bidding has not started yet!');
-            setState(() {
-              statusView = false;
-            });
+            if (mounted) {
+              setState(() {
+                statusView = false;
+              });
+            }
           } else if (currentDate.compareTo(endDate) == 1 ||
               currentDate.compareTo(endDate) == 0) {
             print('Already Done Bidding!');
-            setState(() {
-              statusView = false;
-            });
+            if (mounted) {
+              setState(() {
+                statusView = false;
+              });
+            }
           }
         }
       }
@@ -195,7 +199,7 @@ class _DashboardPageState extends State<DashboardPage> {
         foregroundColor: AppTheme.textWhite,
         elevation: 0,
         title: Text(
-          'Bidding Dashboard',
+          'Dashboard',
           style: AppTheme.getAppBarTitleStyle(scaleFactor),
         ),
         centerTitle: true,
@@ -213,14 +217,13 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          setState(() {
-            fetchProfile();
-            checkBidingTime();
-          });
+          await fetchProfile();
+          await checkBidingTime();
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               // Welcome Header
               Container(
@@ -246,97 +249,57 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                   ],
                 ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
-                          decoration: BoxDecoration(
-                            color: AppTheme.textWhite.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusSmall, scaleFactor)),
-                          ),
-                          child: Icon(
-                            Icons.person,
-                            size: AppTheme.responsiveSize(AppTheme.iconXLarge, scaleFactor),
-                            color: AppTheme.textWhite,
-                          ),
-                        ),
-                        SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Welcome back!',
-                                style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
-                                  color: AppTheme.textWhite.withOpacity(0.9),
-                                ),
-                              ),
-                              SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
-                              Text(
-                                profile.fullName.isNotEmpty ? profile.fullName : 'Bidding User',
-                                style: AppTheme.getBodyStyle(scaleFactor).copyWith(
-                                  color: AppTheme.textWhite,
-                                  fontWeight: AppTheme.fontWeightBold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              
-              // Bidding Statistics
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
                 child: Row(
                   children: [
-                    Expanded(
-                      child: _buildStatCard(
-                        'Active Bids',
-                        '12',
-                        Icons.gavel,
-                        AppTheme.secondaryBlue,
-                        scaleFactor,
+                    Container(
+                      padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
+                      decoration: BoxDecoration(
+                        color: AppTheme.textWhite.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusSmall, scaleFactor)),
+                      ),
+                      child: Icon(
+                        Icons.person,
+                        size: AppTheme.responsiveSize(AppTheme.iconXLarge, scaleFactor),
+                        color: AppTheme.textWhite,
                       ),
                     ),
                     SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                     Expanded(
-                      child: _buildStatCard(
-                        'Won Auctions',
-                        '8',
-                        Icons.emoji_events,
-                        AppTheme.secondaryGreen,
-                        scaleFactor,
-                      ),
-                    ),
-                    SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
-                    Expanded(
-                      child: _buildStatCard(
-                        'Total Spent',
-                        'RM 45K',
-                        Icons.attach_money,
-                        AppTheme.secondaryPurple,
-                        scaleFactor,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Welcome back!',
+                            style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
+                              color: AppTheme.textWhite.withOpacity(0.9),
+                            ),
+                          ),
+                          SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
+                          Text(
+                            profile.fullName.isNotEmpty ? profile.fullName : 'Bidding User',
+                            style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                              color: AppTheme.textWhite,
+                              fontWeight: AppTheme.fontWeightBold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
               
-              SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
               
               // Quick Actions
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
                           padding: AppTheme.getIconCirclePadding(scaleFactor),
@@ -357,9 +320,14 @@ class _DashboardPageState extends State<DashboardPage> {
                       ],
                     ),
                     SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
-                    Row(
+                    Wrap(
+                      spacing: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor),
+                      runSpacing: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor),
                       children: [
-                        Expanded(
+                        SizedBox(
+                          width: (MediaQuery.of(context).size.width - 
+                                 AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor) * 2 - 
+                                 AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)) / 2,
                           child: _buildActionCard(
                             'Join Live Bidding',
                             'Participate in active auctions',
@@ -369,8 +337,10 @@ class _DashboardPageState extends State<DashboardPage> {
                             scaleFactor,
                           ),
                         ),
-                        SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
-                        Expanded(
+                        SizedBox(
+                          width: (MediaQuery.of(context).size.width - 
+                                 AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor) * 2 - 
+                                 AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)) / 2,
                           child: _buildActionCard(
                             'My Bidding History',
                             'View all your bids',
@@ -380,12 +350,10 @@ class _DashboardPageState extends State<DashboardPage> {
                             scaleFactor,
                           ),
                         ),
-                      ],
-                    ),
-                    SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
-                    Row(
-                      children: [
-                        Expanded(
+                        SizedBox(
+                          width: (MediaQuery.of(context).size.width - 
+                                 AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor) * 2 - 
+                                 AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)) / 2,
                           child: _buildActionCard(
                             'Gold Price',
                             'Check current rates',
@@ -395,8 +363,10 @@ class _DashboardPageState extends State<DashboardPage> {
                             scaleFactor,
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
+                        SizedBox(
+                          width: (MediaQuery.of(context).size.width - 
+                                 AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor) * 2 - 
+                                 AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)) / 2,
                           child: _buildActionCard(
                             'Calculator',
                             'Estimate values',
@@ -406,61 +376,20 @@ class _DashboardPageState extends State<DashboardPage> {
                             scaleFactor,
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // Recent Activity
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: AppTheme.getIconCirclePadding(scaleFactor),
-                          decoration: AppTheme.getIconCircleDecoration(AppTheme.secondaryBlue, scaleFactor),
-                          child: Icon(
-                            Icons.history,
-                            color: AppTheme.secondaryBlue,
-                            size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
-                          ),
-                        ),
-                        SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
-                        Text(
-                          'Recent Activity',
-                          style: AppTheme.getHeaderStyle(scaleFactor).copyWith(
-                            color: AppTheme.textPrimary,
+                        SizedBox(
+                          width: (MediaQuery.of(context).size.width - 
+                                 AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor) * 2 - 
+                                 AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)) / 2,
+                          child: _buildActionCard(
+                            'My Profile',
+                            'Update your details',
+                            Icons.person,
+                            const Color(0xFF8B5CF6),
+                            () => Get.to(const ProfilePage()),
+                            scaleFactor,
                           ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 16),
-                    _buildActivityItem(
-                      'Won Gold Ring Auction',
-                      '2 hours ago',
-                      Icons.emoji_events,
-                      Colors.green,
-                      scaleFactor,
-                    ),
-                    _buildActivityItem(
-                      'Placed bid on Silver Chain',
-                      '1 day ago',
-                      Icons.gavel,
-                      Colors.orange,
-                      scaleFactor,
-                    ),
-                    _buildActivityItem(
-                      'Updated profile information',
-                      '3 days ago',
-                      Icons.person,
-                      Colors.blue,
-                      scaleFactor,
                     ),
                   ],
                 ),
@@ -475,42 +404,6 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  // Helper method to build stat cards
-  Widget _buildStatCard(String title, String value, IconData icon, Color color, double scaleFactor) {
-    return Container(
-      padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
-      decoration: AppTheme.getCardDecoration(scaleFactor),
-      child: Column(
-        children: [
-          Container(
-            padding: AppTheme.getIconCirclePadding(scaleFactor),
-            decoration: AppTheme.getIconCircleDecoration(color, scaleFactor),
-            child: Icon(
-              icon,
-              color: color,
-              size: AppTheme.responsiveSize(AppTheme.iconSmall, scaleFactor),
-            ),
-          ),
-          SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
-          Text(
-            value,
-            style: AppTheme.getBodyStyle(scaleFactor).copyWith(
-              color: AppTheme.textPrimary,
-              fontWeight: AppTheme.fontWeightBold,
-            ),
-          ),
-          SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
-          Text(
-            title,
-            style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
-              color: AppTheme.textMuted,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
 
   // Helper method to build action cards
   Widget _buildActionCard(String title, String subtitle, IconData icon, Color color, VoidCallback onTap, double scaleFactor) {
@@ -520,6 +413,7 @@ class _DashboardPageState extends State<DashboardPage> {
         padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
         decoration: AppTheme.getCardDecoration(scaleFactor),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               padding: AppTheme.getIconCirclePadding(scaleFactor),
@@ -561,47 +455,4 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  // Helper method to build activity items
-  Widget _buildActivityItem(String title, String time, IconData icon, Color color, double scaleFactor) {
-    return Container(
-      margin: EdgeInsets.only(bottom: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
-      padding: AppTheme.getCardPadding(scaleFactor),
-      decoration: AppTheme.getCardDecoration(scaleFactor),
-      child: Row(
-        children: [
-          Container(
-            padding: AppTheme.getIconCirclePadding(scaleFactor),
-            decoration: AppTheme.getIconCircleDecoration(color, scaleFactor),
-            child: Icon(
-              icon,
-              color: color,
-              size: AppTheme.responsiveSize(AppTheme.iconXLarge, scaleFactor),
-            ),
-          ),
-          SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: AppTheme.getBodyStyle(scaleFactor).copyWith(
-                    fontWeight: AppTheme.fontWeightSemiBold,
-                    color: AppTheme.textPrimary,
-                  ),
-                ),
-                SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingTiny, scaleFactor)),
-                Text(
-                  time,
-                  style: AppTheme.getCaptionStyle(scaleFactor).copyWith(
-                    color: AppTheme.textMuted,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

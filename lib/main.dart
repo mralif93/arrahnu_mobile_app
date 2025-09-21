@@ -13,6 +13,21 @@ void main() async {
   // Load environment variables
   await dotenv.load(fileName: ".env");
   
+  // Configure EasyLoading
+  EasyLoading.instance
+    ..displayDuration = const Duration(milliseconds: 2000)
+    ..indicatorType = EasyLoadingIndicatorType.fadingCircle
+    ..loadingStyle = EasyLoadingStyle.dark
+    ..indicatorSize = 45.0
+    ..radius = 10.0
+    ..progressColor = Colors.yellow
+    ..backgroundColor = Colors.green
+    ..indicatorColor = Colors.yellow
+    ..textColor = Colors.yellow
+    ..maskColor = Colors.blue.withOpacity(0.5)
+    ..userInteractions = true
+    ..dismissOnTap = false;
+  
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeProvider(),
@@ -26,12 +41,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: Variables.appName,
-      theme: Provider.of<ThemeProvider>(context).themeData,
-      home: const CampaignPage(),
-      builder: EasyLoading.init(),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return GetMaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: Variables.appName,
+          theme: themeProvider.themeData,
+          home: const CampaignPage(),
+          builder: EasyLoading.init(),
+        );
+      },
     );
   }
 }

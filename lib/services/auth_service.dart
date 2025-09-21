@@ -213,24 +213,88 @@ class AuthService {
         );
       }
 
-      final response = await _apiService.post<User>(
-        '${Variables.apiProfileEndpoint}$userId',
-        body: {
-          'id': id,
-          'full_name': fullName,
-          'id_num': idNum,
-          'address': address,
-          'postal_code': postalCode,
-          'city': city,
-          'state': state,
-          'country': country,
-          'hp_number': hpNumber,
-          'user': user,
-        },
-        fromJson: (data) => User.fromJson(data),
-        requiresAuth: true,
-        showLoading: true,
-      );
+      // Try using PATCH method first, fallback to POST if it fails
+      print('Making profile update request to: ${Variables.apiProfileEndpoint}$userId');
+      print('Request body: ${{
+        'full_name': fullName,
+        'id_num': idNum,
+        'address': address,
+        'postal_code': postalCode,
+        'city': city,
+        'state': state,
+        'country': country,
+        'hp_number': hpNumber,
+      }}');
+
+      ApiResponse<User> response;
+      
+      try {
+        // Try PATCH first
+        response = await _apiService.patch<User>(
+          '${Variables.apiProfileEndpoint}$userId',
+          body: {
+            'full_name': fullName,
+            'id_num': idNum,
+            'address': address,
+            'postal_code': postalCode,
+            'city': city,
+            'state': state,
+            'country': country,
+            'hp_number': hpNumber,
+          },
+          fromJson: (data) => User.fromJson(data),
+          requiresAuth: true,
+          showLoading: true,
+        );
+        
+        // If PATCH fails with method not allowed, try POST
+        if (!response.isSuccess && response.error?.message?.contains('Method') == true) {
+          print('PATCH failed, trying POST method...');
+          response = await _apiService.post<User>(
+            '${Variables.apiProfileEndpoint}$userId',
+            body: {
+              'full_name': fullName,
+              'id_num': idNum,
+              'address': address,
+              'postal_code': postalCode,
+              'city': city,
+              'state': state,
+              'country': country,
+              'hp_number': hpNumber,
+            },
+            fromJson: (data) => User.fromJson(data),
+            requiresAuth: true,
+            showLoading: true,
+          );
+        }
+      } catch (e) {
+        print('PATCH failed with exception, trying POST method...');
+        response = await _apiService.post<User>(
+          '${Variables.apiProfileEndpoint}$userId',
+          body: {
+            'full_name': fullName,
+            'id_num': idNum,
+            'address': address,
+            'postal_code': postalCode,
+            'city': city,
+            'state': state,
+            'country': country,
+            'hp_number': hpNumber,
+          },
+          fromJson: (data) => User.fromJson(data),
+          requiresAuth: true,
+          showLoading: true,
+        );
+      }
+
+      print('Profile update response:');
+      print('Success: ${response.isSuccess}');
+      print('Message: ${response.message}');
+      if (response.error != null) {
+        print('Error: ${response.error!.message}');
+        print('Error Type: ${response.error!.type}');
+        print('Status Code: ${response.error!.statusCode}');
+      }
 
       return response;
     } catch (e) {

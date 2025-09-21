@@ -27,9 +27,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
       ..setNavigationDelegate(NavigationDelegate(onProgress: (int progress) {
         print("URL Progress $progress!");
       }, onPageStarted: (String url) {
-        EasyLoading.instance
-          ..indicatorType = EasyLoadingIndicatorType.fadingCircle
-          ..loadingStyle = EasyLoadingStyle.dark;
         EasyLoading.show(status: 'Please wait');
       }, onPageFinished: (String url) {
         EasyLoading.dismiss();

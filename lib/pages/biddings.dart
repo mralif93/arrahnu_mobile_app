@@ -92,21 +92,9 @@ class _BiddingPageState extends State<BiddingPage> {
               backgroundColor: AppTheme.primaryOrange,
               foregroundColor: AppTheme.textWhite,
               elevation: 0,
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    "assets/images/muamalat_logo_01.png",
-                    width: AppTheme.responsiveSize(180, scaleFactor),
-                    height: AppTheme.responsiveSize(60, scaleFactor),
-                    fit: BoxFit.contain,
-                  ),
-                  SizedBox(width: AppTheme.responsiveSize(8, scaleFactor)),
-                  Text(
-                    "My Biddings",
-                    style: AppTheme.getAppBarTitleStyle(scaleFactor),
-                  ),
-                ],
+              title: Text(
+                'My Biddings',
+                style: AppTheme.getAppBarTitleStyle(scaleFactor),
               ),
               centerTitle: true,
             ),

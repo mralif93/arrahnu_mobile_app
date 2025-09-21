@@ -307,6 +307,47 @@ class ApiService {
     }
   }
 
+  // Generic PATCH request
+  Future<ApiResponse<T>> patch<T>(
+    String endpoint, {
+    Map<String, dynamic>? body,
+    T Function(dynamic)? fromJson,
+    bool requiresAuth = true,
+    bool showLoading = true,
+  }) async {
+    if (showLoading) {
+      EasyLoading.show(status: Variables.pleaseWaitText);
+    }
+
+    try {
+      final uri = Uri.parse('$_baseUrl$endpoint');
+      final headers = requiresAuth 
+          ? await _getAuthHeaders() 
+          : Map<String, String>.from(_defaultHeaders);
+
+      final response = await _retryRequest(
+        () => http.patch(
+          uri,
+          headers: headers,
+          body: body != null ? jsonEncode(body) : null,
+        ).timeout(const Duration(seconds: _timeoutSeconds)),
+        fromJson,
+        _maxRetries,
+      );
+
+      if (showLoading) {
+        EasyLoading.dismiss();
+      }
+
+      return response;
+    } catch (error) {
+      if (showLoading) {
+        EasyLoading.dismiss();
+      }
+      return _handleNetworkError<T>(error);
+    }
+  }
+
   // Generic DELETE request
   Future<ApiResponse<T>> delete<T>(
     String endpoint, {

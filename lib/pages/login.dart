@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../components/QButton.dart';
 import '../components/QLogo.dart';
 import '../components/QTextField.dart';
+import '../components/sweet_alert.dart';
 import '../constant/style.dart';
 import '../constant/variables.dart';
 import '../theme/app_theme.dart';
@@ -404,21 +405,19 @@ class _LoginPageState extends State<LoginPage> {
   void signUserIn() async {
     // validate input
     if (_emailController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          duration: Durations.extralong3,
-          content: Text("Email address or Username cannot be empty"),
-        ),
+      SweetAlert.error(
+        title: 'Validation Error',
+        message: 'Email address or Username cannot be empty',
+        confirmText: 'OK',
       );
       return;
     }
     // validate password
     else if (_passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          duration: Durations.extralong3,
-          content: Text("Password cannot be empty"),
-        ),
+      SweetAlert.error(
+        title: 'Validation Error',
+        message: 'Password cannot be empty',
+        confirmText: 'OK',
       );
       return;
       // validate email and password
@@ -443,17 +442,19 @@ class _LoginPageState extends State<LoginPage> {
           );
         } else {
           // Display error message
-          Get.defaultDialog(
-            title: "Error",
-            middleText: 'An unexpected error occurred. Please try login in again. If the problem persists, please contact support.',
-            textConfirm: "OK",
-            onConfirm: () {
-              Navigator.of(context).pop();
-            },
+          SweetAlert.error(
+            title: "Login Failed",
+            message: 'An unexpected error occurred. Please try logging in again. If the problem persists, please contact support.',
+            confirmText: "OK",
           );
         }
       } catch (e) {
         print(e);
+        SweetAlert.error(
+          title: "Login Error",
+          message: 'An error occurred during login. Please try again.',
+          confirmText: "OK",
+        );
       }
     }
   }
