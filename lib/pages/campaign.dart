@@ -911,6 +911,57 @@ class _CampaignPageState extends State<CampaignPage> {
     );
   }
 
+  // Get responsive font size based on device type and screen size
+  double _getResponsiveFontSize(BuildContext context, bool isTablet, double scaleFactor, String textType) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    if (textType == 'title') {
+      if (isTablet) {
+        // Tablet: Scale based on screen width
+        if (screenWidth > 1024) {
+          return AppTheme.responsiveSize(20, scaleFactor); // Large tablet
+        } else if (screenWidth > 768) {
+          return AppTheme.responsiveSize(18, scaleFactor); // Medium tablet
+        } else {
+          return AppTheme.responsiveSize(16, scaleFactor); // Small tablet
+        }
+      } else {
+        // Mobile: Scale based on screen width (iPhone optimized - smaller)
+        if (screenWidth > 414) {
+          return AppTheme.responsiveSize(12, scaleFactor); // Large phone (iPhone Pro Max)
+        } else if (screenWidth > 375) {
+          return AppTheme.responsiveSize(11, scaleFactor); // Medium phone (iPhone Pro/Plus)
+        } else {
+          return AppTheme.responsiveSize(10, scaleFactor); // Small phone (iPhone SE/regular)
+        }
+      }
+    } else if (textType == 'subtitle') {
+      if (isTablet) {
+        // Tablet: Scale based on screen width
+        if (screenWidth > 1024) {
+          return AppTheme.responsiveSize(16, scaleFactor); // Large tablet
+        } else if (screenWidth > 768) {
+          return AppTheme.responsiveSize(14, scaleFactor); // Medium tablet
+        } else {
+          return AppTheme.responsiveSize(12, scaleFactor); // Small tablet
+        }
+      } else {
+        // Mobile: Scale based on screen width (iPhone optimized - smaller)
+        if (screenWidth > 414) {
+          return AppTheme.responsiveSize(9, scaleFactor); // Large phone (iPhone Pro Max)
+        } else if (screenWidth > 375) {
+          return AppTheme.responsiveSize(8, scaleFactor); // Medium phone (iPhone Pro/Plus)
+        } else {
+          return AppTheme.responsiveSize(7, scaleFactor); // Small phone (iPhone SE/regular)
+        }
+      }
+    }
+    
+    // Default fallback
+    return textType == 'title' ? 16.0 : 12.0;
+  }
+
   // Show campaign modal with full poster and details
   void _showCampaignModal(Map<String, dynamic> campaign) {
     final scaleFactor = AppTheme.getScaleFactor(context);
@@ -921,8 +972,8 @@ class _CampaignPageState extends State<CampaignPage> {
         backgroundColor: Colors.transparent,
         child: Container(
           constraints: BoxConstraints(
-            maxWidth: isTablet ? 600 : MediaQuery.of(context).size.width * 0.9,
-            maxHeight: MediaQuery.of(context).size.height * 0.8,
+            maxWidth: isTablet ? MediaQuery.of(context).size.width * 0.8 : MediaQuery.of(context).size.width * 0.95,
+            maxHeight: MediaQuery.of(context).size.height * 0.85,
           ),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -987,9 +1038,7 @@ class _CampaignPageState extends State<CampaignPage> {
                         'Campaign Details',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: isTablet 
-                            ? AppTheme.responsiveSize(20, scaleFactor)
-                            : AppTheme.responsiveSize(18, scaleFactor),
+                          fontSize: _getResponsiveFontSize(context, isTablet, scaleFactor, 'title'),
                           fontWeight: AppTheme.fontWeightBold,
                         ),
                       ),
@@ -1028,7 +1077,9 @@ class _CampaignPageState extends State<CampaignPage> {
                 child: Container(
                   width: double.infinity,
                   constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * 0.5,
+                    maxHeight: isTablet 
+                      ? MediaQuery.of(context).size.height * 0.4
+                      : MediaQuery.of(context).size.height * 0.45,
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.only(
@@ -1045,7 +1096,7 @@ class _CampaignPageState extends State<CampaignPage> {
                     ),
                     child: Image.network(
                       campaign['image'] ?? '',
-                      fit: BoxFit.cover,
+                      fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           height: 200,
@@ -1124,9 +1175,7 @@ class _CampaignPageState extends State<CampaignPage> {
                       campaign['title'] ?? 'Campaign Title',
                       style: TextStyle(
                         color: const Color(0xFF1E293B),
-                        fontSize: isTablet 
-                          ? AppTheme.responsiveSize(24, scaleFactor)
-                          : AppTheme.responsiveSize(20, scaleFactor),
+                        fontSize: _getResponsiveFontSize(context, isTablet, scaleFactor, 'title'),
                         fontWeight: AppTheme.fontWeightBold,
                       ),
                     ),
@@ -1135,9 +1184,7 @@ class _CampaignPageState extends State<CampaignPage> {
                       campaign['description'] ?? 'Campaign description goes here...',
                       style: TextStyle(
                         color: const Color(0xFF64748B),
-                        fontSize: isTablet 
-                          ? AppTheme.responsiveSize(16, scaleFactor)
-                          : AppTheme.responsiveSize(14, scaleFactor),
+                        fontSize: _getResponsiveFontSize(context, isTablet, scaleFactor, 'subtitle'),
                         fontWeight: AppTheme.fontWeightMedium,
                         height: 1.5,
                       ),
@@ -1152,8 +1199,8 @@ class _CampaignPageState extends State<CampaignPage> {
                           foregroundColor: Colors.white,
                           padding: EdgeInsets.symmetric(
                             vertical: isTablet 
-                              ? AppTheme.responsiveSize(16, scaleFactor)
-                              : AppTheme.responsiveSize(14, scaleFactor),
+                              ? AppTheme.responsiveSize(12, scaleFactor)
+                              : AppTheme.responsiveSize(10, scaleFactor),
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(
@@ -1168,8 +1215,8 @@ class _CampaignPageState extends State<CampaignPage> {
                           'Close',
                           style: TextStyle(
                             fontSize: isTablet 
-                              ? AppTheme.responsiveSize(16, scaleFactor)
-                              : AppTheme.responsiveSize(14, scaleFactor),
+                              ? AppTheme.responsiveSize(14, scaleFactor)
+                              : AppTheme.responsiveSize(12, scaleFactor),
                             fontWeight: AppTheme.fontWeightBold,
                           ),
                         ),
