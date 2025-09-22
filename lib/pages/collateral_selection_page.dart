@@ -7,6 +7,9 @@ import '../controllers/authorization.dart';
 import 'collateral_details_page.dart';
 import 'biddings.dart';
 import '../services/session_service.dart';
+import '../components/QButton.dart';
+import '../components/QTextField.dart';
+import '../components/QOutlinedButton.dart';
 
 class CollateralSelectionPage extends StatefulWidget {
   final String selectedBranch;
@@ -488,31 +491,17 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
                               ),
                             ),
                             SizedBox(height: 12 * scaleFactor),
-                            TextFormField(
+                            QTextField(
+                              hintText: 'Bid Amount (RM)',
                               controller: _bidController,
+                              obscureText: false,
+                              icon: Icons.attach_money,
                               keyboardType: TextInputType.number,
-                              style: TextStyle(
-                                fontSize: 12 * scaleFactor,
-                              ),
-                              decoration: InputDecoration(
-                                labelText: 'Bid Amount (RM)',
-                                labelStyle: TextStyle(
-                                  fontSize: 11 * scaleFactor,
-                                ),
-                                hintStyle: TextStyle(
-                                  fontSize: 11 * scaleFactor,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(6 * scaleFactor),
-                                ),
-                                prefixIcon: Icon(
-                                  Icons.attach_money,
-                                  size: 16 * scaleFactor,
-                                ),
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 12 * scaleFactor,
-                                  vertical: 8 * scaleFactor,
-                                ),
+                              fontSize: 12 * scaleFactor,
+                              borderRadius: 6 * scaleFactor,
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 12 * scaleFactor,
+                                vertical: 8 * scaleFactor,
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
@@ -608,53 +597,32 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> {
                             Row(
                               children: [
                                 Expanded(
-                                  child: ElevatedButton(
+                                  child: QButton(
+                                    text: 'Submit Bid',
                                     onPressed: (_isSubmitting || _currentBidCount >= _maxBidsPerAccount) ? null : _submitBid,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.orange,
-                                      foregroundColor: Colors.white,
-                                      padding: EdgeInsets.symmetric(vertical: 8 * scaleFactor),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(6 * scaleFactor),
-                                      ),
-                                    ),
-                                    child: _isSubmitting
-                                        ? SizedBox(
-                                            height: 16 * scaleFactor,
-                                            width: 16 * scaleFactor,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                            ),
-                                          )
-                                        : Text(
-                                            'Submit Bid',
-                                            style: TextStyle(
-                                              fontSize: 11 * scaleFactor,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
+                                    backgroundColor: Colors.orange,
+                                    foregroundColor: Colors.white,
+                                    fontSize: 11 * scaleFactor,
+                                    fontWeight: FontWeight.w600,
+                                    borderRadius: 6 * scaleFactor,
+                                    padding: EdgeInsets.symmetric(vertical: 8 * scaleFactor),
+                                    isLoading: _isSubmitting,
+                                    enabled: !_isSubmitting && _currentBidCount < _maxBidsPerAccount,
                                   ),
                                 ),
                                 SizedBox(width: 12 * scaleFactor),
                                 Expanded(
-                                  child: OutlinedButton(
+                                  child: QOutlinedButton(
+                                    text: 'Cancel',
                                     onPressed: () {
                                       _bidController.clear();
                                     },
-                                    style: OutlinedButton.styleFrom(
-                                      padding: EdgeInsets.symmetric(vertical: 8 * scaleFactor),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(6 * scaleFactor),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Cancel',
-                                      style: TextStyle(
-                                        fontSize: 11 * scaleFactor,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
+                                    borderColor: Colors.orange,
+                                    textColor: Colors.orange,
+                                    fontSize: 11 * scaleFactor,
+                                    fontWeight: FontWeight.w600,
+                                    borderRadius: 6 * scaleFactor,
+                                    padding: EdgeInsets.symmetric(vertical: 8 * scaleFactor),
                                   ),
                                 ),
                               ],

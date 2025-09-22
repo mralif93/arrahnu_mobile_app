@@ -10,6 +10,7 @@ import '../constant/variables.dart';
 import '../theme/app_theme.dart';
 import '../controllers/authorization.dart';
 import '../services/session_service.dart';
+import '../components/QButton.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -96,6 +97,16 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
+      appBar: AppBar(
+        backgroundColor: AppTheme.primaryOrange,
+        foregroundColor: AppTheme.textWhite,
+        elevation: 0,
+        title: Text(
+          'Home',
+          style: AppTheme.getAppBarTitleStyle(scaleFactor),
+        ),
+        centerTitle: true,
+      ),
       body: RefreshIndicator(
         onRefresh: () async {
           setState(() {
@@ -106,9 +117,6 @@ class _HomePageState extends State<HomePage> {
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
-              // Add top padding for status bar
-              SizedBox(height: MediaQuery.of(context).padding.top),
-              
               // Header section with logo
               Container(
                 padding: EdgeInsets.symmetric(
@@ -118,7 +126,7 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   children: [
                     Image.asset(
-                      "assets/images/muamalat_logo_01.png",
+                      "assets/images/pajak-orange.png",
                       width: AppTheme.responsiveSize(280, scaleFactor),
                       height: AppTheme.responsiveSize(120, scaleFactor),
                       fit: BoxFit.contain,
@@ -342,44 +350,23 @@ class _HomePageState extends State<HomePage> {
 
                         // Bidding Button - Only show if session is active and data is loaded
                         if (_isSessionActive) ...[
-                          Container(
-                            width: double.infinity,
+                          QButton(
+                            text: 'Browse Items',
+                            onPressed: () {
+                              _handleBrowseItemsTap();
+                            },
+                            backgroundColor: AppTheme.primaryOrange,
+                            foregroundColor: AppTheme.textWhite,
+                            elevation: 4,
+                            shadowColor: AppTheme.primaryOrange.withOpacity(0.3),
+                            icon: Icon(
+                              Icons.gavel,
+                              size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
+                              color: AppTheme.textWhite,
+                            ),
                             margin: EdgeInsets.symmetric(
                               horizontal: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor), 
                               vertical: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
-                            ),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _handleBrowseItemsTap();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppTheme.primaryOrange,
-                                foregroundColor: AppTheme.textWhite,
-                                padding: EdgeInsets.symmetric(vertical: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusLarge, scaleFactor)),
-                                ),
-                                elevation: 4,
-                                shadowColor: AppTheme.primaryOrange.withOpacity(0.3),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.gavel,
-                                    size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
-                                    color: AppTheme.textWhite,
-                                  ),
-                                  SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
-                                  Text(
-                                    'Browse Items',
-                                    style: AppTheme.getBodyStyle(scaleFactor).copyWith(
-                                      fontWeight: AppTheme.fontWeightSemiBold,
-                                      color: AppTheme.textWhite,
-                                    ),
-                                  ),
-                                ],
-                              ),
                             ),
                           ),
                         ] else ...[

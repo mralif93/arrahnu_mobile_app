@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-class QButton extends StatelessWidget {
+class QOutlinedButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
-  final Color? backgroundColor;
-  final Color? foregroundColor;
+  final Color? borderColor;
+  final Color? textColor;
   final double? fontSize;
   final FontWeight? fontWeight;
   final double? borderRadius;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
-  final double? elevation;
-  final Color? shadowColor;
   final double? width;
   final double? height;
   final bool isLoading;
@@ -20,19 +18,17 @@ class QButton extends StatelessWidget {
   final MainAxisAlignment? alignment;
   final bool enabled;
 
-  const QButton({
+  const QOutlinedButton({
     super.key,
     required this.text,
     required this.onPressed,
-    this.backgroundColor,
-    this.foregroundColor,
+    this.borderColor,
+    this.textColor,
     this.fontSize,
     this.fontWeight,
     this.borderRadius,
     this.padding,
     this.margin,
-    this.elevation,
-    this.shadowColor,
     this.width,
     this.height,
     this.isLoading = false,
@@ -44,8 +40,8 @@ class QButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scaleFactor = AppTheme.getScaleFactor(context);
-    final effectiveBackgroundColor = backgroundColor ?? AppTheme.primaryOrange;
-    final effectiveForegroundColor = foregroundColor ?? AppTheme.textWhite;
+    final effectiveBorderColor = borderColor ?? AppTheme.primaryOrange;
+    final effectiveTextColor = textColor ?? AppTheme.primaryOrange;
     final effectiveFontSize = fontSize ?? AppTheme.responsiveSize(16, scaleFactor);
     final effectiveFontWeight = fontWeight ?? AppTheme.fontWeightSemiBold;
     final effectiveBorderRadius = borderRadius ?? AppTheme.responsiveSize(AppTheme.radiusLarge, scaleFactor);
@@ -54,8 +50,6 @@ class QButton extends StatelessWidget {
       vertical: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
     );
     final effectiveMargin = margin ?? EdgeInsets.zero;
-    final effectiveElevation = elevation ?? 0;
-    final effectiveShadowColor = shadowColor ?? effectiveBackgroundColor.withOpacity(0.3);
     final effectiveWidth = width ?? double.infinity;
     final effectiveHeight = height ?? AppTheme.responsiveSize(56, scaleFactor);
 
@@ -69,7 +63,7 @@ class QButton extends StatelessWidget {
             width: AppTheme.responsiveSize(16, scaleFactor),
             child: CircularProgressIndicator(
               strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(effectiveForegroundColor),
+              valueColor: AlwaysStoppedAnimation<Color>(effectiveTextColor),
             ),
           ),
           if (text.isNotEmpty) SizedBox(width: AppTheme.responsiveSize(8, scaleFactor)),
@@ -84,7 +78,7 @@ class QButton extends StatelessWidget {
             style: TextStyle(
               fontSize: effectiveFontSize,
               fontWeight: effectiveFontWeight,
-              color: effectiveForegroundColor,
+              color: effectiveTextColor,
             ),
           ),
       ],
@@ -94,19 +88,18 @@ class QButton extends StatelessWidget {
       width: effectiveWidth,
       height: effectiveHeight,
       margin: effectiveMargin,
-      child: ElevatedButton(
+      child: OutlinedButton(
         onPressed: enabled && !isLoading ? onPressed : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: effectiveBackgroundColor,
-          foregroundColor: effectiveForegroundColor,
-          elevation: effectiveElevation,
-          shadowColor: effectiveShadowColor,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: effectiveTextColor,
+          side: BorderSide(
+            color: enabled ? effectiveBorderColor : effectiveBorderColor.withOpacity(0.5),
+            width: 1,
+          ),
           padding: effectivePadding,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(effectiveBorderRadius),
           ),
-          disabledBackgroundColor: effectiveBackgroundColor.withOpacity(0.5),
-          disabledForegroundColor: effectiveForegroundColor.withOpacity(0.7),
         ),
         child: buttonContent,
       ),

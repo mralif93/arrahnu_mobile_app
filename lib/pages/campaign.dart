@@ -96,7 +96,7 @@ class _CampaignPageState extends State<CampaignPage> {
                 child: Column(
                   children: [
                     Image.asset(
-                      "assets/images/muamalat_logo_01.png",
+                      "assets/images/pajak-orange.png",
                       width: MediaQuery.of(context).size.width > 768 
                         ? AppTheme.responsiveSize(320, scaleFactor)
                         : AppTheme.responsiveSize(280, scaleFactor),

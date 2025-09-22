@@ -274,32 +274,35 @@ class _ProfilePageState extends State<ProfilePage> {
               _buildSectionHeader('Personal Information', Icons.person, scaleFactor),
               SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
               
-              _buildTextField(
-                'Full Name',
-                Icons.person,
-                fullnameController,
-                false,
-                scaleFactor,
+              QTextField(
+                hintText: 'Full Name',
+                controller: fullnameController,
+                obscureText: false,
+                icon: Icons.person,
+                showCardStyle: true,
+                fontSize: AppTheme.responsiveSize(9, scaleFactor),
               ),
               
               SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
               
-              _buildTextField(
-                'Identification Card No.',
-                Icons.credit_card,
-                identificationController,
-                false,
-                scaleFactor,
+              QTextField(
+                hintText: 'Identification Card No.',
+                controller: identificationController,
+                obscureText: false,
+                icon: Icons.credit_card,
+                showCardStyle: true,
+                fontSize: AppTheme.responsiveSize(9, scaleFactor),
               ),
               
               SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
               
-              _buildTextField(
-                'Mobile Number',
-                Icons.phone,
-                mobileController,
-                false,
-                scaleFactor,
+              QTextField(
+                hintText: 'Mobile Number',
+                controller: mobileController,
+                obscureText: false,
+                icon: Icons.phone,
+                showCardStyle: true,
+                fontSize: AppTheme.responsiveSize(9, scaleFactor),
               ),
 
               SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXXLarge, scaleFactor)),
@@ -308,52 +311,57 @@ class _ProfilePageState extends State<ProfilePage> {
               _buildSectionHeader('Address Information', Icons.location_on, scaleFactor),
               SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
               
-              _buildTextField(
-                'Address',
-                Icons.home,
-                addressController,
-                false,
-                scaleFactor,
+              QTextField(
+                hintText: 'Address',
+                controller: addressController,
+                obscureText: false,
+                icon: Icons.home,
+                showCardStyle: true,
+                fontSize: AppTheme.responsiveSize(9, scaleFactor),
               ),
               
               SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
               
-              _buildTextField(
-                'Postcode',
-                Icons.location_city,
-                postcodeController,
-                false,
-                scaleFactor,
+              QTextField(
+                hintText: 'Postcode',
+                controller: postcodeController,
+                obscureText: false,
+                icon: Icons.location_city,
+                showCardStyle: true,
+                fontSize: AppTheme.responsiveSize(9, scaleFactor),
               ),
               
               SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
               
-              _buildTextField(
-                'City',
-                Icons.location_city,
-                cityController,
-                false,
-                scaleFactor,
+              QTextField(
+                hintText: 'City',
+                controller: cityController,
+                obscureText: false,
+                icon: Icons.location_city,
+                showCardStyle: true,
+                fontSize: AppTheme.responsiveSize(9, scaleFactor),
               ),
               
               SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
               
-              _buildTextField(
-                'State',
-                Icons.map,
-                stateController,
-                false,
-                scaleFactor,
+              QTextField(
+                hintText: 'State',
+                controller: stateController,
+                obscureText: false,
+                icon: Icons.map,
+                showCardStyle: true,
+                fontSize: AppTheme.responsiveSize(9, scaleFactor),
               ),
               
               SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
               
-              _buildTextField(
-                'Country',
-                Icons.public,
-                countryController,
-                false,
-                scaleFactor,
+              QTextField(
+                hintText: 'Country',
+                controller: countryController,
+                obscureText: false,
+                icon: Icons.public,
+                showCardStyle: true,
+                fontSize: AppTheme.responsiveSize(9, scaleFactor),
               ),
 
               SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXXLarge, scaleFactor)),
@@ -375,18 +383,23 @@ class _ProfilePageState extends State<ProfilePage> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Container(
-          padding: AppTheme.getIconCirclePadding(scaleFactor),
-          decoration: AppTheme.getIconCircleDecoration(AppTheme.primaryOrange, scaleFactor),
+          padding: EdgeInsets.all(AppTheme.responsiveSize(6, scaleFactor)),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryOrange.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
           child: Icon(
             icon,
             color: AppTheme.primaryOrange,
-            size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
+            size: AppTheme.responsiveSize(16, scaleFactor),
           ),
         ),
         SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
         Text(
           title,
-          style: AppTheme.getHeaderStyle(scaleFactor).copyWith(
+          style: TextStyle(
+            fontSize: AppTheme.responsiveSize(14, scaleFactor),
+            fontWeight: AppTheme.fontWeightSemiBold,
             color: AppTheme.textPrimary,
           ),
         ),
@@ -411,7 +424,7 @@ class _ProfilePageState extends State<ProfilePage> {
       child: TextField(
         controller: controller,
         obscureText: obscureText,
-        style: AppTheme.getBodyStyle(scaleFactor),
+        style: AppTheme.getCaptionStyle(scaleFactor),
         decoration: InputDecoration(
           prefixIcon: Icon(
             icon,
@@ -449,23 +462,17 @@ class _ProfilePageState extends State<ProfilePage> {
       mainAxisSize: MainAxisSize.min,
       children: [
         // Update Profile Button
-        SizedBox(
-          width: double.infinity,
-          height: AppTheme.responsiveSize(56, scaleFactor),
-          child: ElevatedButton(
-            onPressed: updateProfile,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryOrange,
-              foregroundColor: AppTheme.textWhite,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusLarge, scaleFactor)),
-              ),
-            ),
-            child: Text(
-              'Update Profile',
-              style: AppTheme.getButtonTextStyle(scaleFactor),
-            ),
+        QButton(
+          text: 'Update Profile',
+          onPressed: updateProfile,
+          backgroundColor: AppTheme.primaryOrange,
+          foregroundColor: AppTheme.textWhite,
+          height: AppTheme.responsiveSize(36, scaleFactor),
+          fontSize: AppTheme.responsiveSize(9, scaleFactor),
+          fontWeight: AppTheme.fontWeightMedium,
+          padding: EdgeInsets.symmetric(
+            horizontal: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
+            vertical: AppTheme.responsiveSize(4, scaleFactor),
           ),
         ),
       ],

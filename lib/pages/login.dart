@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../components/QButton.dart';
 import '../components/QLogo.dart';
+import '../components/QTextButton.dart';
 import '../components/QTextField.dart';
 import '../components/sweet_alert.dart';
 import '../constant/style.dart';
@@ -102,18 +103,20 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                SizedBox(height: AppTheme.responsiveSize(12, scaleFactor)),
+
                 // Logo section
                 Transform.translate(
                   offset: Offset(0, AppTheme.responsiveSize(-8, scaleFactor)),
                   child: Image.asset(
-                    "assets/images/muamalat_logo_01.png",
+                    "assets/images/pajak-orange.png",
                     width: AppTheme.responsiveSize(280, scaleFactor),
                     height: AppTheme.responsiveSize(120, scaleFactor),
                     fit: BoxFit.contain,
                   ),
                 ),
 
-                SizedBox(height: AppTheme.responsiveSize(8, scaleFactor)),
+                SizedBox(height: AppTheme.responsiveSize(12, scaleFactor)),
 
                 // Welcome text
                 Text(
@@ -139,102 +142,33 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: AppTheme.responsiveSize(24, scaleFactor)),
 
                 // Email field
-                TextFormField(
+                QTextField(
+                  hintText: 'Email or Username',
                   controller: _emailController,
+                  obscureText: false,
+                  icon: Icons.person_outline,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
-                  style: TextStyle(
-                    fontSize: AppTheme.responsiveSize(16, scaleFactor),
-                    fontWeight: FontWeight.w400,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: 'Email or Username',
-                    hintStyle: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: AppTheme.responsiveSize(12, scaleFactor),
-                      fontWeight: FontWeight.w400,
-                    ),
-                    prefixIcon: Icon(
-                      Icons.person_outline,
-                      color: Colors.grey[600],
-                      size: 20,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Colors.grey[200]!,
-                        width: 1,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Colors.orange,
-                        width: 2,
-                      ),
-                    ),
-                    fillColor: Colors.grey[50],
-                    filled: true,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: AppTheme.responsiveSize(16, scaleFactor),
-                      vertical: AppTheme.responsiveSize(12, scaleFactor),
-                    ),
-                  ),
+                  fontSize: AppTheme.responsiveSize(12, scaleFactor),
+                  fillColor: Colors.grey[50],
+                  borderColor: Colors.grey[200]!,
+                  focusedBorderColor: Colors.orange,
                 ),
 
                 const SizedBox(height: 20),
 
                 // Password field
-                TextFormField(
+                QTextField(
+                  hintText: 'Password',
                   controller: _passwordController,
                   obscureText: true,
+                  icon: Icons.lock_outline,
                   textInputAction: TextInputAction.done,
-                  onFieldSubmitted: (_) => signUserIn(),
-                  style: TextStyle(
-                    fontSize: AppTheme.responsiveSize(16, scaleFactor),
-                    fontWeight: FontWeight.w400,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: 'Password',
-                hintStyle: TextStyle(
-                  color: Colors.grey[500],
+                  onFieldSubmitted: signUserIn,
                   fontSize: AppTheme.responsiveSize(12, scaleFactor),
-                  fontWeight: FontWeight.w400,
-                ),
-                    prefixIcon: Icon(
-                      Icons.lock_outline,
-                      color: Colors.grey[600],
-                      size: 20,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Colors.grey[200]!,
-                        width: 1,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Colors.orange,
-                        width: 2,
-                      ),
-                    ),
-                    fillColor: Colors.grey[50],
-                    filled: true,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: AppTheme.responsiveSize(16, scaleFactor),
-                      vertical: AppTheme.responsiveSize(12, scaleFactor),
-                    ),
-                  ),
+                  fillColor: Colors.grey[50],
+                  borderColor: Colors.grey[200]!,
+                  focusedBorderColor: Colors.orange,
                 ),
 
                 SizedBox(height: AppTheme.responsiveSize(8, scaleFactor)),
@@ -242,7 +176,8 @@ class _LoginPageState extends State<LoginPage> {
                 // Forgot password
                 Align(
                   alignment: Alignment.centerRight,
-                  child: TextButton(
+                  child: QTextButton(
+                    text: 'Forgot Password?',
                     onPressed: () async {
                       try {
                         Uri resetPassword = Uri.parse('${Variables.baseUrl}${Variables.passwordResetUrl}');
@@ -268,45 +203,25 @@ class _LoginPageState extends State<LoginPage> {
                         );
                       }
                     },
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-                    ),
-                    child: Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                        color: Colors.orange[600],
-                        fontSize: AppTheme.responsiveSize(12, scaleFactor),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                    textColor: Colors.orange[600],
+                    fontSize: AppTheme.responsiveSize(12, scaleFactor),
+                    fontWeight: FontWeight.w500,
+                    alignment: MainAxisAlignment.end,
                   ),
                 ),
 
                 SizedBox(height: AppTheme.responsiveSize(16, scaleFactor)),
 
                 // Sign in button
-                SizedBox(
-                  width: double.infinity,
+                QButton(
+                  text: 'Sign In',
+                  onPressed: signUserIn,
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                  fontSize: AppTheme.responsiveSize(12, scaleFactor),
+                  fontWeight: FontWeight.w600,
+                  borderRadius: 12,
                   height: AppTheme.responsiveSize(48, scaleFactor),
-                  child: ElevatedButton(
-                    onPressed: signUserIn,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                      child: Text(
-                        'Sign In',
-                        style: TextStyle(
-                          fontSize: AppTheme.responsiveSize(12, scaleFactor),
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                  ),
                 ),
 
                 SizedBox(height: AppTheme.responsiveSize(16, scaleFactor)),
@@ -354,7 +269,8 @@ class _LoginPageState extends State<LoginPage> {
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    TextButton(
+                    QTextButton(
+                      text: 'Sign Up',
                       onPressed: () async {
                         try {
                           Uri registerUrl = Uri.parse("${Variables.baseUrl}${Variables.signupUrl}");
@@ -380,17 +296,10 @@ class _LoginPageState extends State<LoginPage> {
                           );
                         }
                       },
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-                      ),
-                      child: Text(
-                        'Sign Up',
-                        style: TextStyle(
-                          color: Colors.orange[600],
-                          fontWeight: FontWeight.w600,
-                          fontSize: AppTheme.responsiveSize(12, scaleFactor),
-                        ),
-                      ),
+                      textColor: Colors.orange[600],
+                      fontWeight: FontWeight.w600,
+                      fontSize: AppTheme.responsiveSize(12, scaleFactor),
+                      alignment: MainAxisAlignment.center,
                     ),
                   ],
                 ),
