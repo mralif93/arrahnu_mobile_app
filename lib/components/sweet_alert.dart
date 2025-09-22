@@ -248,6 +248,17 @@ class _SweetAlertDialogState extends State<_SweetAlertDialog>
   Widget build(BuildContext context) {
     final typeColor = _getTypeColor();
     final typeIcon = _getTypeIcon();
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    // Calculate responsive width for iPad/tablet
+    double dialogWidth;
+    if (screenWidth > 768) {
+      // For iPad/tablet: smaller width (max 400px)
+      dialogWidth = screenWidth > 1024 ? 400 : screenWidth * 0.4;
+    } else {
+      // For phone: use default behavior
+      dialogWidth = screenWidth * 0.9;
+    }
 
     return AnimatedBuilder(
       animation: _animationController,
@@ -262,6 +273,7 @@ class _SweetAlertDialogState extends State<_SweetAlertDialog>
               ),
               elevation: 20,
               child: Container(
+                width: dialogWidth,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: Colors.white,

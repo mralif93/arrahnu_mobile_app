@@ -70,6 +70,17 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final scaleFactor = AppTheme.getScaleFactor(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    // Calculate responsive width for iPad/tablet
+    double contentWidth;
+    if (screenWidth > 768) {
+      // For iPad/tablet: bigger width (max 600px)
+      contentWidth = screenWidth > 1024 ? 600 : screenWidth * 0.7;
+    } else {
+      // For phone: use full width
+      contentWidth = screenWidth;
+    }
     
     return Scaffold(
       backgroundColor: AppTheme.backgroundWhite,
@@ -94,15 +105,18 @@ class _LoginPageState extends State<LoginPage> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-            horizontal: AppTheme.responsiveSize(24, scaleFactor),
-            vertical: AppTheme.responsiveSize(4, scaleFactor),
-          ),
-          child: IntrinsicHeight(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+        child: Center(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppTheme.responsiveSize(24, scaleFactor),
+              vertical: AppTheme.responsiveSize(4, scaleFactor),
+            ),
+            child: Container(
+              width: contentWidth,
+              child: IntrinsicHeight(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
                 SizedBox(height: AppTheme.responsiveSize(12, scaleFactor)),
 
                 // Logo section
@@ -110,8 +124,12 @@ class _LoginPageState extends State<LoginPage> {
                   offset: Offset(0, AppTheme.responsiveSize(-8, scaleFactor)),
                   child: Image.asset(
                     "assets/images/pajak-orange.png",
-                    width: AppTheme.responsiveSize(280, scaleFactor),
-                    height: AppTheme.responsiveSize(120, scaleFactor),
+                    width: screenWidth > 768 
+                        ? AppTheme.responsiveSize(400, scaleFactor)  // Bigger for tablet/iPad
+                        : AppTheme.responsiveSize(280, scaleFactor), // Normal for phone
+                    height: screenWidth > 768 
+                        ? AppTheme.responsiveSize(170, scaleFactor)  // Bigger for tablet/iPad
+                        : AppTheme.responsiveSize(120, scaleFactor), // Normal for phone
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -303,7 +321,9 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ],
                 ),
-              ],
+                  ],
+                ),
+              ),
             ),
           ),
         ),

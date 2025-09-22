@@ -1197,15 +1197,18 @@ class _CampaignPageState extends State<CampaignPage> {
                       backgroundColor: const Color(0xFFFE8000),
                       foregroundColor: Colors.white,
                       fontSize: isTablet 
-                        ? AppTheme.responsiveSize(14, scaleFactor)
+                        ? AppTheme.responsiveSize(16, scaleFactor)
                         : AppTheme.responsiveSize(12, scaleFactor),
                       fontWeight: AppTheme.fontWeightBold,
                       borderRadius: isTablet 
                         ? AppTheme.responsiveSize(12, scaleFactor)
                         : AppTheme.responsiveSize(10, scaleFactor),
+                      height: isTablet 
+                        ? AppTheme.responsiveSize(56, scaleFactor)  // Much taller for tablet/iPad
+                        : AppTheme.responsiveSize(44, scaleFactor), // Normal height for phone
                       padding: EdgeInsets.symmetric(
                         vertical: isTablet 
-                          ? AppTheme.responsiveSize(12, scaleFactor)
+                          ? AppTheme.responsiveSize(16, scaleFactor)  // Increased padding
                           : AppTheme.responsiveSize(10, scaleFactor),
                       ),
                     ),
