@@ -190,7 +190,7 @@ class _AccountPageState extends State<AccountPage> {
                 // Sign in button
                 SizedBox(
                   width: double.infinity,
-                  height: AppTheme.responsiveSize(56, scaleFactor),
+                  height: AppTheme.responsiveSize(AppTheme.buttonHeightLarge, scaleFactor),
                   child: ElevatedButton(
                     onPressed: () {
                       Get.to(const LoginPage());

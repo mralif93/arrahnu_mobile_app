@@ -221,7 +221,7 @@ class _LoginPageState extends State<LoginPage> {
                   fontSize: AppTheme.responsiveSize(12, scaleFactor),
                   fontWeight: FontWeight.w600,
                   borderRadius: 12,
-                  height: AppTheme.responsiveSize(48, scaleFactor),
+                  height: AppTheme.responsiveSize(AppTheme.buttonHeightMedium, scaleFactor),
                 ),
 
                 SizedBox(height: AppTheme.responsiveSize(16, scaleFactor)),

@@ -43,7 +43,9 @@ class BiddingService {
 
       final response = await _apiService.get<List<dynamic>>(
         '${Variables.apiBidListEndpoint}$userId',
-        fromJson: (data) => data is List ? data : [],
+        fromJson: (data) {
+          return data is List ? data : [];
+        },
         requiresAuth: true,
         showLoading: true,
       );
@@ -60,7 +62,7 @@ class BiddingService {
     }
   }
 
-  // Check bid count for a specific user-account combination
+  // Check bid count for a specific user-account combination using bidding history
   Future<ApiResponse<int>> getBidCountForUserAccount({
     required int userId,
     required String accountNumber,
@@ -83,13 +85,10 @@ class BiddingService {
       final productsResponse = await getBiddingAccounts();
       
       if (!productsResponse.isSuccess || productsResponse.data == null) {
-        return ApiResponse<int>.error(
-          error: ApiError(
-            statusCode: 0,
-            message: 'Failed to get products for count check',
-            type: ApiErrorType.unknown,
-          ),
-        );
+        // Alternative: Count all bids for the user (since we can't match by account)
+        // This is a fallback when the products API fails
+        int totalBidCount = userBiddingsResponse.data!.length;
+        return ApiResponse<int>.success(data: totalBidCount);
       }
 
       // Create a map of product ID to account number
@@ -104,7 +103,9 @@ class BiddingService {
       int bidCount = 0;
       for (var bid in userBiddingsResponse.data!) {
         final productId = bid['product'] as int?;
-        if (productId != null && productToAccount[productId] == accountNumber) {
+        final mappedAccount = productToAccount[productId];
+        
+        if (productId != null && mappedAccount == accountNumber) {
           bidCount++;
         }
       }
@@ -121,17 +122,45 @@ class BiddingService {
     }
   }
 
+  // Get total bid count from bidding history (simpler approach)
+  Future<ApiResponse<int>> getTotalBidCount() async {
+    try {
+      print('=== TOTAL BID COUNT FROM HISTORY ===');
+      
+      final userBiddingsResponse = await getUserBiddings();
+      
+      if (!userBiddingsResponse.isSuccess || userBiddingsResponse.data == null) {
+        return ApiResponse<int>.error(
+          error: ApiError(
+            statusCode: 0,
+            message: 'Failed to get user biddings for count',
+            type: ApiErrorType.unknown,
+          ),
+        );
+      }
+
+      int totalBidCount = userBiddingsResponse.data!.length;
+      print('Total bid count from history: $totalBidCount');
+      print('Bid data: ${userBiddingsResponse.data}');
+      
+      return ApiResponse<int>.success(data: totalBidCount);
+    } catch (e) {
+      return ApiResponse<int>.error(
+        error: ApiError(
+          statusCode: 0,
+          message: 'Failed to get total bid count: ${e.toString()}',
+          type: ApiErrorType.unknown,
+        ),
+      );
+    }
+  }
+
   // Get bidding accounts/products
   Future<ApiResponse<List<dynamic>>> getBiddingAccounts() async {
     try {
       final response = await _apiService.get<List<dynamic>>(
-        Variables.apiPagesEndpoint,
-        queryParams: {
-          'type': 'product.ProductPage',
-          'fields': '*',
-          'limit': '8000',
-        },
-        fromJson: (data) => data['items'] is List ? data['items'] : [],
+        '${Variables.baseUrl}/api/collateral/',
+        fromJson: (data) => data is List ? data : [],
         requiresAuth: true,
         showLoading: true,
       );

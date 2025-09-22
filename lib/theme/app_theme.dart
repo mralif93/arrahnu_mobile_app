@@ -70,6 +70,11 @@ class AppTheme {
   static const double iconXXLarge = 26.0;
   static const double iconXXXLarge = 30.0;
   
+  // Button Heights
+  static const double buttonHeightSmall = 36.0;
+  static const double buttonHeightMedium = 44.0;
+  static const double buttonHeightLarge = 56.0;
+  
   // Shadow
   static List<BoxShadow> get cardShadow => [
     BoxShadow(

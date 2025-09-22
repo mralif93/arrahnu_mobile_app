@@ -359,10 +359,17 @@ class _HomePageState extends State<HomePage> {
                             foregroundColor: AppTheme.textWhite,
                             elevation: 4,
                             shadowColor: AppTheme.primaryOrange.withOpacity(0.3),
+                            height: AppTheme.responsiveSize(AppTheme.buttonHeightSmall, scaleFactor),
+                            fontSize: AppTheme.responsiveSize(12, scaleFactor),
+                            fontWeight: AppTheme.fontWeightMedium,
                             icon: Icon(
                               Icons.gavel,
-                              size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
+                              size: AppTheme.responsiveSize(16, scaleFactor),
                               color: AppTheme.textWhite,
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
+                              vertical: AppTheme.responsiveSize(6, scaleFactor),
                             ),
                             margin: EdgeInsets.symmetric(
                               horizontal: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor), 

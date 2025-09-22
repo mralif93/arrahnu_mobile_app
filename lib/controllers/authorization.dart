@@ -164,6 +164,11 @@ class AuthController {
     }
   }
 
+  // Get total bid count from bidding history
+  Future<ApiResponse<int>> getTotalBidCount() async {
+    return await _biddingService.getTotalBidCount();
+  }
+
   // Get Gold Prices
   Future<ApiResponse<List<dynamic>>> getGoldPrices() async {
     return await _biddingService.getGoldPrices();

@@ -51,7 +51,7 @@ class QOutlinedButton extends StatelessWidget {
     );
     final effectiveMargin = margin ?? EdgeInsets.zero;
     final effectiveWidth = width ?? double.infinity;
-    final effectiveHeight = height ?? AppTheme.responsiveSize(56, scaleFactor);
+    final effectiveHeight = height ?? AppTheme.responsiveSize(AppTheme.buttonHeightSmall, scaleFactor);
 
     Widget buttonContent = Row(
       mainAxisAlignment: alignment!,

@@ -57,7 +57,7 @@ class QButton extends StatelessWidget {
     final effectiveElevation = elevation ?? 0;
     final effectiveShadowColor = shadowColor ?? effectiveBackgroundColor.withOpacity(0.3);
     final effectiveWidth = width ?? double.infinity;
-    final effectiveHeight = height ?? AppTheme.responsiveSize(56, scaleFactor);
+    final effectiveHeight = height ?? AppTheme.responsiveSize(AppTheme.buttonHeightSmall, scaleFactor);
 
     Widget buttonContent = Row(
       mainAxisAlignment: alignment!,

@@ -47,10 +47,6 @@ class _CollateralDetailsPageState extends State<CollateralDetailsPage> {
     final double scaleFactor = (screenWidth / 375).clamp(0.8, 1.2);
 
     try {
-      // Debug: Print all available fields
-      print('🔍 Collateral item keys: ${widget.collateralItem.keys.toList()}');
-      print('🔍 Full collateral item: $widget.collateralItem');
-      
       // Extract data from collateral item
     final category = widget.collateralItem['category'] as String? ?? 'N/A';
     final title = widget.collateralItem['title'] as String? ?? 'N/A';
@@ -99,10 +95,6 @@ class _CollateralDetailsPageState extends State<CollateralDetailsPage> {
         }
       }
     }
-    
-    print('🔍 Raw images data: $imagesRaw');
-    print('🔍 Extracted image paths: $images');
-    print('🔍 Images count: ${images.length}');
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -354,9 +346,6 @@ class _CollateralDetailsPageState extends State<CollateralDetailsPage> {
                         final imagePath = images[index];
                         final imageUrl = '${Variables.baseUrl}$imagePath';
                         
-                        print('🔍 Image $index path: $imagePath');
-                        print('🔍 Image $index URL: $imageUrl');
-                        
                         return GestureDetector(
                           onTap: () => _showFullScreenImage(context, imageUrl, index + 1, images.length),
                           child: Container(
@@ -387,7 +376,6 @@ class _CollateralDetailsPageState extends State<CollateralDetailsPage> {
                                       );
                                     },
                                     errorBuilder: (context, error, stackTrace) {
-                                      print('❌ Image load error: $error');
                                       return Container(
                                         color: Colors.grey[200],
                                         child: Column(

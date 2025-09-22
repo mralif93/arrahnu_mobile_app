@@ -7,6 +7,7 @@ import 'dart:convert';
 
 import '../constant/variables.dart';
 import '../theme/app_theme.dart';
+import '../components/QButton.dart';
 import 'home.dart';
 import 'dashboard.dart';
 import 'login.dart';
@@ -1190,36 +1191,22 @@ class _CampaignPageState extends State<CampaignPage> {
                       ),
                     ),
                     SizedBox(height: AppTheme.responsiveSize(20, scaleFactor)),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () => Get.back(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFE8000),
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(
-                            vertical: isTablet 
-                              ? AppTheme.responsiveSize(12, scaleFactor)
-                              : AppTheme.responsiveSize(10, scaleFactor),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              isTablet 
-                                ? AppTheme.responsiveSize(12, scaleFactor)
-                                : AppTheme.responsiveSize(10, scaleFactor),
-                            ),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          'Close',
-                          style: TextStyle(
-                            fontSize: isTablet 
-                              ? AppTheme.responsiveSize(14, scaleFactor)
-                              : AppTheme.responsiveSize(12, scaleFactor),
-                            fontWeight: AppTheme.fontWeightBold,
-                          ),
-                        ),
+                    QButton(
+                      text: 'Close',
+                      onPressed: () => Get.back(),
+                      backgroundColor: const Color(0xFFFE8000),
+                      foregroundColor: Colors.white,
+                      fontSize: isTablet 
+                        ? AppTheme.responsiveSize(14, scaleFactor)
+                        : AppTheme.responsiveSize(12, scaleFactor),
+                      fontWeight: AppTheme.fontWeightBold,
+                      borderRadius: isTablet 
+                        ? AppTheme.responsiveSize(12, scaleFactor)
+                        : AppTheme.responsiveSize(10, scaleFactor),
+                      padding: EdgeInsets.symmetric(
+                        vertical: isTablet 
+                          ? AppTheme.responsiveSize(12, scaleFactor)
+                          : AppTheme.responsiveSize(10, scaleFactor),
                       ),
                     ),
                   ],

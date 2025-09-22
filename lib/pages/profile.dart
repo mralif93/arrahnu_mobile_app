@@ -467,8 +467,8 @@ class _ProfilePageState extends State<ProfilePage> {
           onPressed: updateProfile,
           backgroundColor: AppTheme.primaryOrange,
           foregroundColor: AppTheme.textWhite,
-          height: AppTheme.responsiveSize(36, scaleFactor),
-          fontSize: AppTheme.responsiveSize(9, scaleFactor),
+          height: AppTheme.responsiveSize(AppTheme.buttonHeightSmall, scaleFactor),
+          fontSize: AppTheme.responsiveSize(10, scaleFactor),
           fontWeight: AppTheme.fontWeightMedium,
           padding: EdgeInsets.symmetric(
             horizontal: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
