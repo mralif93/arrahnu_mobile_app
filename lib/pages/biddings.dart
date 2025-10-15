@@ -16,7 +16,19 @@ class BiddingPage extends StatefulWidget {
 class _BiddingPageState extends State<BiddingPage> {
   // variable
   late var biddingsData = [];
+  late var filteredBiddingsData = [];
   bool isLoading = true;
+  
+  // Filter variables
+  String? selectedYear;
+  String? selectedMonth;
+  List<String> availableYears = [];
+  List<String> availableMonths = [];
+  Map<String, String> monthNames = {
+    '01': 'January', '02': 'February', '03': 'March', '04': 'April',
+    '05': 'May', '06': 'June', '07': 'July', '08': 'August',
+    '09': 'September', '10': 'October', '11': 'November', '12': 'December'
+  };
 
   // variable to call and store future list of biddings
   Future<List<Bidding>> biddingsFuture = getBiddings();
@@ -111,6 +123,8 @@ class _BiddingPageState extends State<BiddingPage> {
 
     setState(() {
       biddingsData = jsonData1;
+      filteredBiddingsData = List.from(jsonData1);
+      _extractAvailableDates();
       isLoading = false;
     });
   }
@@ -149,6 +163,17 @@ class _BiddingPageState extends State<BiddingPage> {
           style: AppTheme.getAppBarTitleStyle(scaleFactor),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: _showFilterDialog,
+            icon: Icon(
+              Icons.filter_list,
+              color: AppTheme.textWhite,
+              size: AppTheme.responsiveSize(AppTheme.iconXXLarge, scaleFactor),
+            ),
+            tooltip: 'Filter by Date',
+          ),
+        ],
       ),
       body: isLoading
           ? _buildLoadingState(scaleFactor)
@@ -227,6 +252,9 @@ class _BiddingPageState extends State<BiddingPage> {
 
   // Modern empty state
   Widget _buildEmptyState(double scaleFactor) {
+    // Check if it's a filter result or truly no biddings
+    bool isFilteredEmpty = biddingsData.isNotEmpty && filteredBiddingsData.isEmpty;
+    
     return Center(
       child: Padding(
         padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingXXXLarge, scaleFactor)),
@@ -241,21 +269,23 @@ class _BiddingPageState extends State<BiddingPage> {
                 borderRadius: BorderRadius.circular(AppTheme.responsiveSize(50, scaleFactor)),
               ),
               child: Icon(
-                Icons.gavel_outlined,
+                isFilteredEmpty ? Icons.search_off : Icons.gavel_outlined,
                 size: AppTheme.responsiveSize(AppTheme.iconXXXLarge, scaleFactor),
                 color: AppTheme.textMuted,
               ),
             ),
             SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXLarge, scaleFactor)),
             Text(
-              'No Biddings Yet',
+              isFilteredEmpty ? 'No Results Found' : 'No Biddings Yet',
               style: AppTheme.getTitleStyle(scaleFactor).copyWith(
                 color: AppTheme.textPrimary,
               ),
             ),
             SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
             Text(
-              'You haven\'t placed any bids yet.\nStart bidding to see them here.',
+              isFilteredEmpty 
+                ? 'No biddings found for the selected filter.\nTry adjusting your search criteria.'
+                : 'You haven\'t placed any bids yet.\nStart bidding to see them here.',
               textAlign: TextAlign.center,
               style: AppTheme.getBodyStyle(scaleFactor).copyWith(
                 color: AppTheme.textMuted,
@@ -263,26 +293,52 @@ class _BiddingPageState extends State<BiddingPage> {
               ),
             ),
             SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXLarge, scaleFactor)),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryOrange,
-                foregroundColor: AppTheme.textWhite,
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppTheme.responsiveSize(AppTheme.spacingXXXLarge, scaleFactor),
-                  vertical: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor),
+            if (isFilteredEmpty)
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    selectedYear = null;
+                    selectedMonth = null;
+                    _applyFilters();
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryOrange,
+                  foregroundColor: AppTheme.textWhite,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppTheme.responsiveSize(AppTheme.spacingXXXLarge, scaleFactor),
+                    vertical: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor),
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusLarge, scaleFactor)),
+                  ),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusLarge, scaleFactor)),
+                child: Text(
+                  'Clear Filters',
+                  style: AppTheme.getButtonTextStyle(scaleFactor),
+                ),
+              )
+            else
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryOrange,
+                  foregroundColor: AppTheme.textWhite,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppTheme.responsiveSize(AppTheme.spacingXXXLarge, scaleFactor),
+                    vertical: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor),
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusLarge, scaleFactor)),
+                  ),
+                ),
+                child: Text(
+                  'Start Bidding',
+                  style: AppTheme.getButtonTextStyle(scaleFactor),
                 ),
               ),
-              child: Text(
-                'Start Bidding',
-                style: AppTheme.getButtonTextStyle(scaleFactor),
-              ),
-            ),
           ],
         ),
       ),
@@ -297,13 +353,24 @@ class _BiddingPageState extends State<BiddingPage> {
           getAccountBiddings();
         });
       },
-      child: ListView.builder(
-        padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
-        itemCount: biddingsData.length,
-        itemBuilder: (context, index) {
-          final bid = biddingsData[index];
-          return _buildBiddingCard(bid, scaleFactor, index);
-        },
+      child: Column(
+        children: [
+          // Filter status bar
+          if (selectedYear != null || selectedMonth != null)
+            _buildFilterStatusBar(scaleFactor),
+          
+          // Biddings list
+          Expanded(
+            child: ListView.builder(
+              padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
+              itemCount: filteredBiddingsData.length,
+              itemBuilder: (context, index) {
+                final bid = filteredBiddingsData[index];
+                return _buildBiddingCard(bid, scaleFactor, index);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -515,5 +582,275 @@ class _BiddingPageState extends State<BiddingPage> {
     }
     
     return branchTitle.toUpperCase();
+  }
+
+  // Extract available dates from biddings data
+  void _extractAvailableDates() {
+    Set<String> years = {};
+    Set<String> months = {};
+    
+    for (var bid in biddingsData) {
+      try {
+        DateTime bidDate = DateTime.parse(bid['created_at']).toLocal();
+        String year = bidDate.year.toString();
+        String month = bidDate.month.toString().padLeft(2, '0');
+        
+        years.add(year);
+        months.add(month);
+      } catch (e) {
+        print('Error parsing date: $e');
+      }
+    }
+    
+    availableYears = years.toList()..sort((a, b) => b.compareTo(a)); // Sort descending
+    availableMonths = months.toList()..sort();
+  }
+
+  // Apply filters to biddings data
+  void _applyFilters() {
+    filteredBiddingsData = biddingsData.where((bid) {
+      try {
+        DateTime bidDate = DateTime.parse(bid['created_at']).toLocal();
+        String bidYear = bidDate.year.toString();
+        String bidMonth = bidDate.month.toString().padLeft(2, '0');
+        
+        bool yearMatch = selectedYear == null || bidYear == selectedYear;
+        bool monthMatch = selectedMonth == null || bidMonth == selectedMonth;
+        
+        return yearMatch && monthMatch;
+      } catch (e) {
+        return false;
+      }
+    }).toList();
+  }
+
+  // Show filter dialog
+  void _showFilterDialog() {
+    final scaleFactor = AppTheme.getScaleFactor(context);
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Row(
+                children: [
+                  Icon(
+                    Icons.filter_list,
+                    color: AppTheme.primaryOrange,
+                    size: AppTheme.responsiveSize(AppTheme.iconLarge, scaleFactor),
+                  ),
+                  SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
+                  Text(
+                    'Filter Biddings',
+                    style: AppTheme.getHeaderStyle(scaleFactor),
+                  ),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Year filter
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
+                      vertical: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor),
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey[300]!),
+                      borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusMedium, scaleFactor)),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: selectedYear,
+                        hint: Text(
+                          'Select Year',
+                          style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        isExpanded: true,
+                        items: [
+                          DropdownMenuItem<String>(
+                            value: null,
+                            child: Text(
+                              'All Years',
+                              style: AppTheme.getBodyStyle(scaleFactor),
+                            ),
+                          ),
+                          ...availableYears.map((year) => DropdownMenuItem<String>(
+                            value: year,
+                            child: Text(
+                              year,
+                              style: AppTheme.getBodyStyle(scaleFactor),
+                            ),
+                          )),
+                        ],
+                        onChanged: (String? newValue) {
+                          setDialogState(() {
+                            selectedYear = newValue;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  
+                  SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
+                  
+                  // Month filter
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
+                      vertical: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor),
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey[300]!),
+                      borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusMedium, scaleFactor)),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: selectedMonth,
+                        hint: Text(
+                          'Select Month',
+                          style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        isExpanded: true,
+                        items: [
+                          DropdownMenuItem<String>(
+                            value: null,
+                            child: Text(
+                              'All Months',
+                              style: AppTheme.getBodyStyle(scaleFactor),
+                            ),
+                          ),
+                          ...availableMonths.map((month) => DropdownMenuItem<String>(
+                            value: month,
+                            child: Text(
+                              monthNames[month] ?? month,
+                              style: AppTheme.getBodyStyle(scaleFactor),
+                            ),
+                          )),
+                        ],
+                        onChanged: (String? newValue) {
+                          setDialogState(() {
+                            selectedMonth = newValue;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    setDialogState(() {
+                      selectedYear = null;
+                      selectedMonth = null;
+                    });
+                  },
+                  child: Text(
+                    'Clear All',
+                    style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Cancel',
+                    style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _applyFilters();
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryOrange,
+                    foregroundColor: AppTheme.textWhite,
+                  ),
+                  child: Text('Apply Filter'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // Build filter status bar
+  Widget _buildFilterStatusBar(double scaleFactor) {
+    return Container(
+      margin: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
+      padding: EdgeInsets.all(AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)),
+      decoration: BoxDecoration(
+        color: AppTheme.primaryOrange.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusMedium, scaleFactor)),
+        border: Border.all(
+          color: AppTheme.primaryOrange.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.filter_alt,
+            color: AppTheme.primaryOrange,
+            size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
+          ),
+          SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
+          Expanded(
+            child: Text(
+              _getFilterStatusText(),
+              style: AppTheme.getBodyStyle(scaleFactor).copyWith(
+                color: AppTheme.primaryOrange,
+                fontWeight: AppTheme.fontWeightMedium,
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                selectedYear = null;
+                selectedMonth = null;
+                _applyFilters();
+              });
+            },
+            child: Icon(
+              Icons.close,
+              color: AppTheme.primaryOrange,
+              size: AppTheme.responsiveSize(AppTheme.iconMedium, scaleFactor),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Get filter status text
+  String _getFilterStatusText() {
+    if (selectedYear != null && selectedMonth != null) {
+      return 'Showing biddings for ${monthNames[selectedMonth]} ${selectedYear} (${filteredBiddingsData.length} results)';
+    } else if (selectedYear != null) {
+      return 'Showing biddings for ${selectedYear} (${filteredBiddingsData.length} results)';
+    } else if (selectedMonth != null) {
+      return 'Showing biddings for ${monthNames[selectedMonth]} (${filteredBiddingsData.length} results)';
+    }
+    return 'Showing all biddings (${filteredBiddingsData.length} results)';
   }
 }

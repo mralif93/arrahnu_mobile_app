@@ -133,7 +133,7 @@ class _BranchSelectionPageState extends State<BranchSelectionPage> {
               );
             },
             icon: Icon(
-              Icons.history,
+              Icons.gavel,
               color: AppTheme.textWhite,
               size: AppTheme.responsiveSize(AppTheme.iconXXLarge, scaleFactor),
             ),
