@@ -581,7 +581,7 @@ class _CollateralDetailsPageState extends State<CollateralDetailsPage> {
           ),
           SizedBox(height: 4 * scaleFactor),
           Text(
-            'RM ${value.toStringAsFixed(0)}',
+            'RM ${value.toStringAsFixed(2)}',
             style: TextStyle(
               fontSize: 14 * scaleFactor,
               fontWeight: FontWeight.bold,

@@ -398,12 +398,16 @@ class _BiddingPageState extends State<BiddingPage> {
                   color: AppTheme.primaryOrange,
                 ),
                 SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
-                Text(
-                  bid['account_number'] ?? 'Unknown Account',
-                  style: AppTheme.getHeaderStyle(scaleFactor).copyWith(
-                    color: AppTheme.textPrimary,
-                    fontSize: AppTheme.responsiveSize(AppTheme.fontSizeMedium, scaleFactor),
-                    fontWeight: AppTheme.fontWeightMedium,
+                Expanded(
+                  child: Text(
+                    bid['account_number'] ?? 'Unknown Account',
+                    style: AppTheme.getHeaderStyle(scaleFactor).copyWith(
+                      color: AppTheme.textPrimary,
+                      fontSize: AppTheme.responsiveSize(AppTheme.fontSizeMedium, scaleFactor),
+                      fontWeight: AppTheme.fontWeightMedium,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -432,7 +436,7 @@ class _BiddingPageState extends State<BiddingPage> {
                     scaleFactor,
                   ),
                 ),
-                SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingLarge, scaleFactor)),
+                SizedBox(width: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                 Expanded(
                   child: _buildPriceInfo(
                     'Your Bid',
@@ -482,6 +486,7 @@ class _BiddingPageState extends State<BiddingPage> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             children: [
@@ -499,6 +504,8 @@ class _BiddingPageState extends State<BiddingPage> {
                     fontWeight: AppTheme.fontWeightSemiBold,
                     fontSize: AppTheme.responsiveSize(AppTheme.fontSizeTiny, scaleFactor),
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -509,8 +516,10 @@ class _BiddingPageState extends State<BiddingPage> {
             style: AppTheme.getBodyStyle(scaleFactor).copyWith(
               fontWeight: AppTheme.fontWeightBold,
               color: color,
-              fontSize: AppTheme.responsiveSize(AppTheme.fontSizeMedium, scaleFactor),
+              fontSize: AppTheme.responsiveSize(AppTheme.fontSizeSmall, scaleFactor),
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

@@ -148,7 +148,7 @@ class _AccountSelectionPageState extends State<AccountSelectionPage> {
               );
             },
             icon: Icon(
-              Icons.history,
+              Icons.gavel,
               color: AppTheme.textWhite,
               size: AppTheme.responsiveSize(AppTheme.iconXXLarge, scaleFactor),
             ),

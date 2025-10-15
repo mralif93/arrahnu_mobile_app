@@ -242,10 +242,10 @@ class _DashboardPageState extends State<DashboardPage> {
                   borderRadius: BorderRadius.circular(AppTheme.responsiveSize(AppTheme.radiusXLarge, scaleFactor)),
                   boxShadow: [
                     BoxShadow(
-                      color: AppTheme.primaryOrange.withOpacity(0.3),
-                      spreadRadius: 2,
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+                      color: AppTheme.primaryOrange.withOpacity(0.15),
+                      spreadRadius: 1,
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
@@ -290,6 +290,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
               ),
               
+              // Add spacing between welcome card and quick actions
+              SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingXLarge, scaleFactor)),
               
               // Quick Actions
               Padding(
@@ -321,13 +323,13 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     SizedBox(height: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)),
                     Wrap(
-                      spacing: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor),
-                      runSpacing: AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor),
+                      spacing: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
+                      runSpacing: AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor),
                       children: [
                         SizedBox(
                           width: (MediaQuery.of(context).size.width - 
                                  AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor) * 2 - 
-                                 AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)) / 2,
+                                 AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)) / 2,
                           child: _buildActionCard(
                             'Join Live Bidding',
                             'Participate in active auctions',
@@ -340,11 +342,11 @@ class _DashboardPageState extends State<DashboardPage> {
                         SizedBox(
                           width: (MediaQuery.of(context).size.width - 
                                  AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor) * 2 - 
-                                 AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)) / 2,
+                                 AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)) / 2,
                           child: _buildActionCard(
                             'My Bidding History',
                             'View all your bids',
-                            Icons.history,
+                            Icons.list_alt,
                             const Color(0xFF3B82F6),
                             () => Get.to(const BiddingPage()),
                             scaleFactor,
@@ -353,7 +355,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         SizedBox(
                           width: (MediaQuery.of(context).size.width - 
                                  AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor) * 2 - 
-                                 AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)) / 2,
+                                 AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)) / 2,
                           child: _buildActionCard(
                             'Gold Price',
                             'Check current rates',
@@ -366,7 +368,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         SizedBox(
                           width: (MediaQuery.of(context).size.width - 
                                  AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor) * 2 - 
-                                 AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)) / 2,
+                                 AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)) / 2,
                           child: _buildActionCard(
                             'Calculator',
                             'Estimate values',
@@ -379,7 +381,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         SizedBox(
                           width: (MediaQuery.of(context).size.width - 
                                  AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor) * 2 - 
-                                 AppTheme.responsiveSize(AppTheme.spacingSmall, scaleFactor)) / 2,
+                                 AppTheme.responsiveSize(AppTheme.spacingMedium, scaleFactor)) / 2,
                           child: _buildActionCard(
                             'My Profile',
                             'Update your details',

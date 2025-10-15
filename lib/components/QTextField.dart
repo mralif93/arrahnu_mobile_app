@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
 
 class QTextField extends StatelessWidget {
@@ -20,6 +21,8 @@ class QTextField extends StatelessWidget {
   final EdgeInsets? padding;
   final bool showCardStyle;
   final List<BoxShadow>? boxShadow;
+  final List<TextInputFormatter>? inputFormatters;
+  final ValueChanged<String>? onChanged;
 
   const QTextField({
     super.key,
@@ -41,6 +44,8 @@ class QTextField extends StatelessWidget {
     this.padding,
     this.showCardStyle = false,
     this.boxShadow,
+    this.inputFormatters,
+    this.onChanged,
   });
 
   @override
@@ -67,6 +72,8 @@ class QTextField extends StatelessWidget {
       textInputAction: textInputAction,
       onFieldSubmitted: onFieldSubmitted != null ? (_) => onFieldSubmitted!() : null,
       validator: validator,
+      inputFormatters: inputFormatters,
+      onChanged: onChanged,
       style: TextStyle(
         fontSize: effectiveFontSize,
         fontWeight: FontWeight.w400,

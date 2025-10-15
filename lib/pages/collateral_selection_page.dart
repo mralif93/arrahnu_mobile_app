@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../constant/variables.dart';
@@ -116,7 +117,8 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> with 
       }
       
       // Count bids for this specific account using account identification
-      int accountBidCount = 0;
+      // Group bids by account and count unique bid sessions (same created_at timestamp)
+      Map<String, List<Map<String, dynamic>>> accountBidsBySession = {};
       List<Map<String, dynamic>> accountBids = [];
       
       for (var bid in userBiddingsResponse.data!) {
@@ -124,11 +126,21 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> with 
         if (productId != null && productToAccount.containsKey(productId)) {
           final mappedAccount = productToAccount[productId];
           if (mappedAccount == widget.selectedAccount) {
-            accountBidCount++;
             accountBids.add(bid);
+            // Group by created_at timestamp to identify bid sessions
+            final createdAt = bid['created_at'] as String?;
+            if (createdAt != null) {
+              if (!accountBidsBySession.containsKey(createdAt)) {
+                accountBidsBySession[createdAt] = [];
+              }
+              accountBidsBySession[createdAt]!.add(bid);
+            }
           }
         }
       }
+      
+      // Count unique bid sessions (each session represents one bid for the account)
+      int accountBidCount = accountBidsBySession.length;
       
       setState(() {
         _currentBidCount = accountBidCount;
@@ -692,7 +704,7 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> with 
     }
 
     try {
-      final bidAmount = double.parse(_bidController.text);
+      final bidAmount = int.parse(_bidController.text).toDouble();
       final authController = AuthController();
       
       // Get all items for this account
@@ -701,29 +713,37 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> with 
                item['page']?['acc_num'] == widget.selectedAccount;
       }).toList();
 
-      bool allSuccess = true;
-      for (var item in accountItems) {
-        final productId = item['page']?['id'] as int?;
-        final originalPrice = _parseToDouble(item['priceAfterDiscount']) ?? 0.0;
+      // Only submit ONE bid for the account (using the first item as representative)
+      // This prevents creating multiple bid records for the same account
+      bool allSuccess = false;
+      if (accountItems.isNotEmpty) {
+        final firstItem = accountItems.first;
+        final productId = firstItem['page']?['id'] as int?;
+        
+        // Calculate total account value for reserved price (consistent with minimum bid validation)
+        double totalAccountValue = 0.0;
+        for (var item in accountItems) {
+          final itemValue = _parseToDouble(item['priceAfterDiscount']) ?? 0.0;
+          totalAccountValue += itemValue;
+        }
         
         if (productId != null) {
           final result = await authController.submitUserBid(
             productId,
-            originalPrice,
+            totalAccountValue, // Use total account value as reserved price
             bidAmount,
           );
           
-          if (!result.isSuccess) {
-            allSuccess = false;
-          }
+          allSuccess = result.isSuccess;
         }
       }
 
       if (allSuccess) {
         // Update bid count locally first (immediate feedback)
-          setState(() {
-            _currentBidCount++;
-          });
+        // Only increment by 1 since this is one bid session for the account
+        setState(() {
+          _currentBidCount++;
+        });
         
         // Then refresh from server to ensure accuracy
         await _checkBidCount();
@@ -868,7 +888,7 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> with 
               );
             },
             icon: Icon(
-              Icons.history,
+              Icons.gavel,
               color: AppTheme.textWhite,
               size: AppTheme.responsiveSize(AppTheme.iconXLarge, scaleFactor),
             ),
@@ -995,7 +1015,7 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> with 
                               Expanded(
                                 child: _buildStatCard(
                                   'Value',
-                                  'RM${totalValue.toStringAsFixed(0)}',
+                                  'RM${totalValue.toStringAsFixed(2)}',
                                   Icons.attach_money,
                                   Colors.green,
                                   scaleFactor,
@@ -1057,7 +1077,7 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> with 
                             ),
                             SizedBox(height: 8 * scaleFactor),
                             Text(
-                              'This will place the same bid amount for all $totalItems items in this account. Bid must be greater than the item value.',
+                              'This will place a bid for this account (representing all $totalItems items). Bid must be greater than the total account value.',
                               style: TextStyle(
                                 fontSize: 10 * scaleFactor,
                                 color: Colors.grey[600],
@@ -1069,33 +1089,51 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> with 
                               controller: _bidController,
                               obscureText: false,
                               icon: Icons.attach_money,
-                              keyboardType: TextInputType.number,
-                                fontSize: 12 * scaleFactor,
+                              keyboardType: TextInputType.numberWithOptions(decimal: false),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              onChanged: (value) {
+                                // Auto-format the input to ensure it's a valid integer
+                                if (value.isNotEmpty) {
+                                  final intValue = int.tryParse(value);
+                                  if (intValue != null && intValue.toString() != value) {
+                                    _bidController.value = TextEditingValue(
+                                      text: intValue.toString(),
+                                      selection: TextSelection.collapsed(offset: intValue.toString().length),
+                                    );
+                                  }
+                                }
+                              },
+                              fontSize: 12 * scaleFactor,
                               borderRadius: 6 * scaleFactor,
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 12 * scaleFactor,
-                                  vertical: 8 * scaleFactor,
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 12 * scaleFactor,
+                                vertical: 8 * scaleFactor,
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter bid amount';
                                 }
-                                final amount = double.tryParse(value);
+                                
+                                // Parse as integer to ensure no decimal places
+                                final amount = int.tryParse(value);
                                 if (amount == null || amount <= 0) {
-                                  return 'Please enter valid amount';
+                                  return 'Please enter valid amount (whole numbers only)';
                                 }
                                 
-                                // Check if bid amount is greater than the minimum value
-                                double minValue = 0.0;
+                                // Check if bid amount is greater than the total value
+                                double totalValue = 0.0;
                                 for (var item in filteredCollaterals) {
                                   final itemValue = _parseToDouble(item['priceAfterDiscount']) ?? 0.0;
-                                  if (itemValue > minValue) {
-                                    minValue = itemValue;
-                                  }
+                                  totalValue += itemValue;
                                 }
                                 
-                                if (amount <= minValue) {
-                                  return 'Bid must be greater than RM${minValue.toStringAsFixed(0)}';
+                                // Round up total value to nearest RM1
+                                final minBidAmount = (totalValue.ceil()).toInt();
+                                
+                                if (amount < minBidAmount) {
+                                  return 'Bid must be at least RM$minBidAmount';
                                 }
                                 
                                 return null;
@@ -1105,15 +1143,15 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> with 
                             // Show minimum bid amount
                             Builder(
                               builder: (context) {
-                                double minValue = 0.0;
+                                double totalValue = 0.0;
                                 for (var item in filteredCollaterals) {
                                   final itemValue = _parseToDouble(item['priceAfterDiscount']) ?? 0.0;
-                                  if (itemValue > minValue) {
-                                    minValue = itemValue;
-                                  }
+                                  totalValue += itemValue;
                                 }
+                                // Round up total value to nearest RM1
+                                final minBidAmount = (totalValue.ceil()).toInt();
                                 return Text(
-                                  'Minimum bid: RM${minValue.toStringAsFixed(0)}',
+                                  'Minimum bid: RM$minBidAmount (increments of RM1)',
                                   style: TextStyle(
                                     fontSize: 9 * scaleFactor,
                                     color: Colors.orange[600],
@@ -1166,12 +1204,6 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> with 
                                   GestureDetector(
                                     onTap: () async {
                                       await _checkBidCount();
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text('Bid count refreshed'),
-                                          duration: Duration(seconds: 1),
-                                        ),
-                                      );
                                     },
                                     child: Icon(
                                       Icons.refresh,
@@ -1239,7 +1271,7 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> with 
                               child: Row(
                                 children: [
                                   Icon(
-                                    Icons.history,
+                                    Icons.gavel,
                                     size: 14 * scaleFactor,
                                     color: Colors.green[600],
                                   ),
@@ -1544,7 +1576,7 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> with 
                         ),
                         SizedBox(height: 4 * scaleFactor),
                         Text(
-                          'RM${fullPrice.toStringAsFixed(0)}',
+                          'RM${fullPrice.toStringAsFixed(2)}',
                           style: TextStyle(
                             fontSize: 12 * scaleFactor,
                             fontWeight: FontWeight.w600,
@@ -1571,7 +1603,7 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> with 
                         ),
                         SizedBox(height: 4 * scaleFactor),
                         Text(
-                          'RM${discount.toStringAsFixed(0)}',
+                          'RM${discount.toStringAsFixed(2)}',
                           style: TextStyle(
                             fontSize: 12 * scaleFactor,
                             fontWeight: FontWeight.w600,
@@ -1598,7 +1630,7 @@ class _CollateralSelectionPageState extends State<CollateralSelectionPage> with 
                         ),
                         SizedBox(height: 4 * scaleFactor),
                         Text(
-                          'RM${priceAfterDiscount.toStringAsFixed(0)}',
+                          'RM${priceAfterDiscount.toStringAsFixed(2)}',
                           style: TextStyle(
                             fontSize: 12 * scaleFactor,
                             fontWeight: FontWeight.w600,
