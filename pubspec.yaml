@@ -2,7 +2,7 @@ name: BMMB_Pajak_Gadai_I
 description: "Muamalat Pajak Gadai Islam (Ar-Rahnu)"
 
 publish_to: 'none'
-version: 2.0.2+10018
+version: 2.0.2+10019
 
 environment:
   sdk: '>=3.2.6 <4.0.0'
